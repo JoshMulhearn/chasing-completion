@@ -1,0 +1,53 @@
+
+
+.navbar {
+    background-color: #171A21;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.navbar h1 {
+    font-size: 20px;
+    font-family: "orbitron";
+    margin: 0;
+}
+
+.navbar a {
+    text-decoration: none;
+    font-size: 25px;
+    padding: 10px;
+    color: white;
+    font-family: "genos";
+}
+
+.navbar .ham-bars {
+    color: white;
+}
+
+.navbar .logo-headers {
+    width: 20px;
+    padding-bottom: 8px;
+    padding-top: 8px;
+}
+
+.navbar .bar-menu {
+    height: 50px;
+    width: 50px;
+}
+
+.bar-menu:hover {
+    cursor: pointer;
+}
+
+.navbar .profile-btn {
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+}
+
+.profile-btn:hover {
+    cursor: pointer;
+}
