@@ -23,10 +23,6 @@
     font-family: "genos";
 }
 
-.navbar .ham-bars {
-    color: white;
-}
-
 .navbar .logo-headers {
     width: 20px;
     padding-bottom: 8px;
@@ -42,12 +38,29 @@
     cursor: pointer;
 }
 
-.navbar .profile-btn {
-    border-radius: 50%;
-    height: 50px;
-    width: 50px;
+.profile-btn {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: none;
+    appearance: none;
+    background-color: inherit;
+    z-index: 1;
 }
 
 .profile-btn:hover {
     cursor: pointer;
+}
+
+.profile-btn-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    
+}
+
+.profile-btn-container {
+    position: relative;
+    height: 50px;
+    width: 50px;
 }

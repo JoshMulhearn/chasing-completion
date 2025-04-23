@@ -13,8 +13,10 @@
         <a href="#">Link</a>
         <a href="#">Link</a>
     </ul>
-
-    <button class="profile-btn">
-        <img src="" alt="profile">
-    </button>
+    <div class="profile-btn-container">
+        <button class="profile-btn">
+         
+        </button>
+        <img class="profile-btn-img" src="images/profile-placeholder-1.svg" alt="profile">
+    </div>
 </nav>
