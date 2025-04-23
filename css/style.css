@@ -10,3 +10,42 @@ body {
     flex-direction: column;
     min-height: 100vh; /* Ensure body takes at least full viewport height */
 }
+
+/*Index Page*/
+
+.index-title {
+    font-family: "genos";
+    font-weight: 500;
+    color: white;
+    font-size: 60px;
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.index-box-container {
+    background-color: #171A21;
+    width: 60%;
+    height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 80%;
+}
+
+.index-box-container p {
+    color: white;
+    font-family: "roboto";
+    padding: 10px;
+    font-size: 20px;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.index-box-container button {
+    width: 100px;
+    margin-bottom: auto;
+}

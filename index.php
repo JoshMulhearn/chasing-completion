@@ -17,6 +17,18 @@
 </head>
 <body>
     <?php include 'navbar.php'?>
+    <h1 class="index-title">Track Your Achievements</h1>
+
+    <div class="index-box-container">
+        <p>
+            Login in to steam and get started tracking your achievements,
+            seeing your progress against others on our leaderboard,
+            view your completionist stats, and more!
+        </p>
+
+        <button>steam login placeholder</button>
+    </div>
+
     <?php include 'footer.php'?>
 </body>
 </html>
