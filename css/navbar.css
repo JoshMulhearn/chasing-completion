@@ -1,3 +1,45 @@
+/*Off screen menu*/
+.off-screen-menu {
+    background-color: #2A475E;
+    left: -450px;
+    position: absolute;
+    transition: 0.3s ease;
+    height: 100vh;
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 8;
+    border-right: 1px solid #171A21;
+}
+
+.off-screen-menu.active {
+    left: 0;
+}
+
+.off-screen-menu ul{
+    list-style: none;
+}
+
+.off-screen-menu li {
+    margin-top: 30px;
+}
+
+.off-screen-menu a {
+    color: white;
+    font-size: 25px;
+    font-family: "genos";
+    text-decoration: none;
+    padding: 10px;
+    transition: 0.3s ease-in-out;
+}
+
+.off-screen-menu a:hover {
+    margin-left: 20px;
+    border-left: 1px solid #171A21;
+}
 
 
 .navbar {
@@ -7,12 +49,14 @@
     justify-content: space-between;
     align-items: center;
     color: white;
+    z-index: 9;
 }
 
 .navbar h1 {
     font-size: 20px;
     font-family: "orbitron";
     margin: 0;
+    z-index: 13;
 }
 
 .navbar a {
@@ -22,17 +66,20 @@
     color: white;
     font-family: "genos";
     margin-left: 70px;
+    z-index: 12;
 }
 
 .navbar .logo-headers {
     width: 20px;
     padding-bottom: 8px;
     padding-top: 8px;
+    z-index: 11;
 }
 
 .navbar .bar-menu {
     height: 50px;
-    width: 50px;
+    width: 50px;    
+    z-index: 10;
 }
 
 .bar-menu:hover {

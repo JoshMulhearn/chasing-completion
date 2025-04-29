@@ -1,4 +1,6 @@
 
+
+
 <nav class="navbar">
     
     <img class="bar-menu" src="images/hamburger-icon.svg" alt="bar-menu">
@@ -20,3 +22,12 @@
         <img class="profile-btn-img" src="images/profile-placeholder-1.svg" alt="profile">
     </div>
 </nav>
+
+<div class="off-screen-menu">
+    <ul>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms and Conditions</a></li>
+    </ul>
+</div>

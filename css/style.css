@@ -9,6 +9,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* Ensure body takes at least full viewport height */
+
 }
 
 /*Index Page*/
@@ -23,7 +24,7 @@ body {
     margin-top: auto;
 }
 
-.index-box-container {
+.box-container {
     background-color: #171A21;
     width: 60%;
     height: 300px;
@@ -35,7 +36,7 @@ body {
     opacity: 80%;
 }
 
-.index-box-container p {
+.box-container p {
     color: white;
     font-family: "roboto";
     padding: 10px;
@@ -45,7 +46,74 @@ body {
     margin-bottom: auto;
 }
 
-.index-box-container button {
+.box-container button {
     width: 100px;
     margin-bottom: auto;
+}
+
+/*Admin Login Page*/
+.admin-login-container {
+    background-color: #171A21;
+    width: 40%;
+    height: 400px;
+    margin-top: auto;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: 1px solid #171A21;
+    border-radius: 30px;
+}
+
+.admin-login-box {
+    background-color: #2A475E;
+    width: 60%;
+    height: 60%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #171A21;
+    border-radius: 30px;
+  
+}
+
+.admin-login-container h2 {
+    margin: auto;
+    margin-bottom: 0;
+    font-family: "genos";
+    color: white;
+    font-size: 35px;
+}
+
+.input-field label {
+    font-family: "roboto";
+    color: white;
+}
+
+.input-field input{
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    margin: 8px 0 8px 0;
+    border-radius: 10px;
+    border: 1px solid #171A21;
+    font-family: "roboto";
+}
+
+.admin-login-box button {
+    font-family: "roboto";
+    padding: 5px;
+    border: 1px solid #171A21;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #1B2838;
+    color: white;
+}
+
+.admin-body {
+    background-image: url(../Images/game-list-background.jpg);
 }

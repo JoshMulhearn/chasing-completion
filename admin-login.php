@@ -13,22 +13,29 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/style.css">
     <!---->
-    <title>Chasing Completion</title>
+    <title>Chasing Completion - Admin Login</title>
 </head>
-<body>
+<body class="admin-body">
     <?php include 'navbar.php'?>
-    <h1 class="index-title">Track Your Achievements</h1>
+    <div class="admin-login-container">
+            <h2>Admin Login</h2>
+        <div class="admin-login-box">
 
-    <div class="box-container">
-        <p>
-            Login in to steam and get started tracking your achievements,
-            seeing your progress against others on our leaderboard,
-            view your completionist stats, and more!
-        </p>
+            <form>
+                <div class="input-field">
+                    <label>Username</label>
+                    <input type="text">   
+                </div>
 
-        <button>steam login placeholder</button>
+                <div class="input-field">
+                    <label>Password</label>
+                    <input type="text">   
+                </div>
+
+                <button type="submit">Login</button>
+            </form>
+        </div>
     </div>
-
     <?php include 'footer.php'?>
 </body>
 <script src="javascript/bar-menu.js"></script>
