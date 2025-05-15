@@ -1,3 +1,13 @@
+<?php
+    session_start();
+    if(!$_SESSION['logged_in']){
+        header("Location: Error.php");
+        exit();
+    }
+    //i dont know what this is. Continue watching video at https://www.youtube.com/watch?v=7IzEqAK_PLg
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,23 +27,7 @@
 </head>
 <body>
     <?php include 'navbar.php'?>
-    <h1 class="index-title">Track Your Achievements</h1>
-
-    <div class="box-container">
-        <p>
-            Login in to steam and get started tracking your achievements,
-            seeing your progress against others on our leaderboard,
-            view your completionist stats, and more!
-        </p>
-        <a href="init-openId.php">
-            <button>
-                <div class="steam-login-btn-items">
-                    <img src="Images/steam-icon.png">
-                    <h3>Login With Steam</h3>
-                </div>
-            </button>
-        </a>
-    </div>
+    <h1>Welcome you are logged in</h1>
 
     <?php include 'footer.php'?>
 </body>

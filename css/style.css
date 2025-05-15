@@ -47,8 +47,24 @@ body {
 }
 
 .box-container button {
-    width: 100px;
+    width: 230px;
     margin-bottom: auto;
+    background-color: #c7d5e0;
+    cursor: pointer;
+    border: 1px solid #171A21;
+    border-radius: 15px;
+}
+
+.steam-login-btn-items {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-family: "roboto";
+}
+
+.steam-login-btn-items img {
+    margin-right: 10px;
 }
 
 /*Admin Login Page*/
