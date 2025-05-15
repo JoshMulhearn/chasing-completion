@@ -1,16 +1,3 @@
-<?php
-    session_start();
-    if(!$_SESSION['logged_in']){
-        header("Location: Error.php");
-        exit();
-    }
-    
-    //variables from process-openId
-    $username = $_SESSION['userData']['name']; 
-    $avatar = $_SESSION['userData']['avatar'];
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,13 +13,12 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/style.css">
     <!---->
-    <title>Chasing Completion</title>
+    <title>Error</title>
 </head>
 <body>
-    <?php include 'navbar.php'?>
-    <div class="text-4xl mt-3 flex items-center font-medium"><img src='<?php echo $avatar;?>' class="rounded-full w-12 h-12 mr-3"/><?php echo $username;?></div>
-    <a href="logout.php" class="text-sm mt-5">Logout</a>
-    <?php include 'footer.php'?>
+    <div class="error-container">
+        <h1>You do not have access to this page.</h1>
+        <li><a href="index.php">Home</a></li>
+    </div>
 </body>
-<script src="javascript/bar-menu.js"></script>
 </html>

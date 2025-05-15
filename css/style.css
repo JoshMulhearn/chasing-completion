@@ -48,7 +48,7 @@ body {
 
 .box-container button {
     width: 230px;
-    margin-bottom: auto;
+    margin-bottom: 30px;
     background-color: #c7d5e0;
     cursor: pointer;
     border: 1px solid #171A21;
@@ -132,4 +132,31 @@ body {
 
 .admin-body {
     background-image: url(../Images/game-list-background.jpg);
+}
+
+/*Error Page*/
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+}
+
+.error-container h1 {
+    font-family: "genos";
+    color: white;
+    font-size: 50px;
+    margin-bottom: 30px;
+}
+
+.error-container li {
+    list-style: none;
+}
+
+.error-container a{
+    color: white;
+    text-decoration: none ;
+    font-family: "genos";
+    font-size: 30px;
 }
