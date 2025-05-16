@@ -1,18 +1,15 @@
 <?php
     session_start();
-
-    //if a user is not logged in they get redirected to the error page
-    //this page lets them know that they do not have access as they are not logged in
     if(!$_SESSION['logged_in']){
         header("Location: Error.php");
-        exit(); 
+        exit();
     }
+
     
     //variables from process-openId
     $username = $_SESSION['userData']['name']; 
     $avatar = $_SESSION['userData']['avatar'];
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,8 +30,7 @@
 </head>
 <body>
     <?php include 'navbar.php'?>
-    <div class="text-4xl mt-3 flex items-center font-medium"><img src='<?php echo $avatar;?>' class="rounded-full w-12 h-12 mr-3"/><?php echo $username;?></div>
-    <a href="logout.php" class="text-sm mt-5">Logout</a>
+
     <?php include 'footer.php'?>
 </body>
 <script src="javascript/bar-menu.js"></script>

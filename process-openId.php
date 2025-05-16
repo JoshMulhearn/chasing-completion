@@ -4,7 +4,7 @@
         return '<pre>'.print_r($arr,true).'</pre>';
     }
 
-
+    //parameters to send to steam open id
     $params = [
         'openid.assoc_handle' => $_GET['openid_assoc_handle'],
         'openid.signed'       => $_GET['openid_signed'],
@@ -13,6 +13,7 @@
         'openid.mode'         => 'check_authentication',
     ];
 
+    //dynamically use $_GET['openid_signed'] parameter to construct more parameters
     $signed = explode(',', $_GET['openid_signed']);
     
     foreach ($signed as $item) {
@@ -20,7 +21,7 @@
         $params['openid.'.$item] = stripslashes($val);
     }
 
-
+    //construct headers to hit steam endpoint with our open id information
     $data = http_build_query($params);
     //data prep
     $context = stream_context_create([
@@ -36,6 +37,8 @@
     //get the data
     $result = file_get_contents('https://steamcommunity.com/openid/login', false, $context);
 
+
+    // check result is valid
     if(preg_match("#is_valid\s*:\s*true#i", $result))
     {
         preg_match('#^https://steamcommunity.com/openid/id/([0-9]{17,25})#', $_GET['openid_claimed_id'], $matches);
@@ -51,6 +54,8 @@
 
     $steam_api_key = 'CF9C8D9F6B8A4AD8DBE9D6DB383949E5'; //my api key. Per the terms and conditions this is not to be shared!
 
+
+    //use steam id to get user data with api
     $response = file_get_contents('https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key='.$steam_api_key.'&steamids='.$steamID64); //will need to add in more get contents for user games etc
     $response = json_decode($response,true);
 

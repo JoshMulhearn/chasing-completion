@@ -25,7 +25,7 @@
             seeing your progress against others on our leaderboard,
             view your completionist stats, and more!
         </p>
-        
+
         <a href="init-openId.php">
             <button>
                 <div class="steam-login-btn-items">
