@@ -160,3 +160,46 @@ body {
     font-family: "genos";
     font-size: 30px;
 }
+
+/*games.php styling*/
+
+.search-and-filter-container .your_games_count {
+    font-family: 'genos';
+    font-size: 30px;
+    margin-left: 30px;
+    color: white;
+}
+
+.search-and-filter-container{
+    width: 600px;
+    height: 100px;
+    margin-left: 50px;
+    margin-top: 50px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-and-filter-container .search-container {
+    background-color: #171A21;
+    height: 50px;
+    width: 600px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 40px;
+}
+
+.search-container input{
+    margin-left: 30px;
+    border-radius: 40px;
+    height: 25px;
+    font-family: 'roboto';
+}
+
+.search-container p{ /*This wont be p forever this is just placeholder*/
+    margin-right: 60px;
+    color: white;
+    font-family: 'roboto';
+}

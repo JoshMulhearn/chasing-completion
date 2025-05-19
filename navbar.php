@@ -67,7 +67,7 @@
                 echo '<li><a href="profile.php">Profile</a></li>';
                 echo '<li><a href="achievements.php">Achievements</a></li>';
                 echo '<li><a href="user-stats.php">User Stats</a></li>';
-                echo "<li><a href='logout.php'</a>Logout</li>";
+                echo "<li><a href='logout.php'>Logout</a></li>";
             }
         ?>
     </ul>

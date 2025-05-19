@@ -33,8 +33,11 @@
 </head>
 <body>
     <?php include 'navbar.php'?>
-    <div class="text-4xl mt-3 flex items-center font-medium"><img src='<?php echo $avatar;?>' class="rounded-full w-12 h-12 mr-3"/><?php echo $username;?></div>
-    <a href="logout.php" class="text-sm mt-5">Logout</a>
+    <div>
+        <img src='<?php echo $avatar;?>'/>
+        <h2><?php echo $username;?></h2>
+    </div>
+    <a href="logout.php">Logout</a>
     <?php include 'footer.php'?>
 </body>
 <script src="javascript/bar-menu.js"></script>

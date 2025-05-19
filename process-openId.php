@@ -56,17 +56,40 @@
 
 
     //use steam id to get user data with api
-    $response = file_get_contents('https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key='.$steam_api_key.'&steamids='.$steamID64); //will need to add in more get contents for user games etc
-    $response = json_decode($response,true);
+    $player_sum_response = file_get_contents('https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key='.$steam_api_key.'&steamids='.$steamID64); 
+    $player_sum_response = json_decode($player_sum_response,true);
+
+    //owned games data with api
+    $owned_games_response = file_get_contents('https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key='.$steam_api_key.'&steamid='.$steamID64.'&include_appinfo=1&include_played_free_games=1');
+    $owned_games_response = json_decode($owned_games_response,true);
+
 
     //relevant user data from the previous response (steam id, username, avatar)
-    $userData = $response['response']['players'][0];
+    $playerSum = $player_sum_response['response']['players'][0];
+    //relevant owned games data
+    $ownedGamesList = $owned_games_response['response']['games'];
+    $gameCount = $owned_games_response['response']['game_count'];
+
     $_SESSION['logged_in'] = true;
+    // Initialize with player summary
     $_SESSION['userData'] = [
-        'steam_id'=>$userData['steamid'],
-        'name'=>$userData['personaname'],
-        'avatar'=>$userData['avatarmedium'],
+        'steam_id'    => $playerSum['steamid'],
+        'name'        => $playerSum['personaname'],
+        'avatar'      => $playerSum['avatarmedium'],
     ];
+
+    // Add owned games data as the full array which will be looped through for specific data
+    if (isset($owned_games_response['response']) && isset($owned_games_response['response']['games'])) {
+        $_SESSION['userData']['owned_games'] = [
+            'game_count' => $owned_games_response['response']['game_count'] ?? 0,
+            'games'      => $owned_games_response['response']['games']
+        ];
+    }    
+    else 
+    {
+        $_SESSION['userData']['owned_games'] = ['game_count' => 0, 'games' => []];
+        //if no games list is empty
+    }
 
     $redirect_url = "dashboard.php";
     header("Location: $redirect_url"); 
