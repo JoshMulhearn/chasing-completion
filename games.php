@@ -40,72 +40,83 @@
 <body>
     <?php include 'navbar.php';?>
 
-        <?php
-            //only show games list if there is valid game data
-            if (isset($ownedGamesData['game_count']) && $ownedGamesData['game_count'] > 0 && !empty($ownedGamesData['games'])) {
-                echo "
-                <div class='search-and-filter-container'>
-                    <h2 class='your_games_count'>" . $ownedGamesData['game_count'] . " Games</h2>
-                    <div class='search-container'>
-                        <input type='text' placeholder='Search..'>
-                        <p>Genre</p>
-                        <p>Theme</p>
-                    </div>
-                </div>"; //genre and theme are currently placeholders
+<?php
+    //only show games list if there is valid game data
+    if (isset($ownedGamesData['game_count']) && $ownedGamesData['game_count'] > 0 && !empty($ownedGamesData['games'])) {
+        
+        //search and filter container
+        echo "<div class='search-and-filter-container'>" .
+                 "<h2 class='your_games_count'>" . htmlspecialchars($ownedGamesData['game_count']) . " Games</h2>" . // Added htmlspecialchars
+                 "<div class='search-container'>" .
+                     "<input type='text' placeholder='Search..'>" .
+                     "<p>Genre</p>" .
+                     "<p>Theme</p>" .
+                 "</div>" .
+             "</div>"; //genre and theme are currently placeholders
 
+        // Start the unordered list for games
+        echo "<ul class='games-list-container'>"; // Assuming this was intended to be outside the search container but before the loop
 
-                //loop through every game
-                foreach ($ownedGamesData['games'] as $game) {
+        //loop through every game
+        foreach ($ownedGamesData['games'] as $game) {
 
-                    //get relevant game data
-                    $gameAppId = $game['appid'] ?? 'N/A';
-                    $gameName = $game['name'] ?? 'Unknown Game';
-                    $playtimeForever = $game['playtime_forever'] ?? 0;
-                    $playtimeHours = round($playtimeForever / 60, 1);
+            //get relevant game data and sanitize it
+            $gameAppId = $game['appid'] ?? 'N/A';
+            $gameName = $game['name'] ?? 'Unknown Game';
+            $playtimeForever = $game['playtime_forever'] ?? 0;
+            $playtimeHours = round($playtimeForever / 60, 1);
 
-                    //game image is empty as it is filled using the following if statement
-                    $gameImageUrl = "";
-                    $achievementsPageUrl = "#"; // Default link if no appid
+            // Sanitize all dynamic data before including in HTML
+            $safeGameName = htmlspecialchars($gameName);
+            $safeGameAppId = htmlspecialchars($gameAppId);
+            $safePlaytimeHours = htmlspecialchars($playtimeHours);
 
-                    // Use the standardized Steam CDN URL for the library capsule image
-                    // This relies only on the appid
-                    if ($gameAppId !== 'N/A') {
-                        $gameImageUrl = "https://cdn.akamai.steamstatic.com/steam/apps/{$gameAppId}/library_600x900.jpg";
-                        // Construct the URL for the game's achievement page, passing the appid
-                        $achievementsPageUrl = "game_achievements.php?appid=" . urlencode($gameAppId);
-                    }
+            //game image is empty as it is filled using the following if statement
+            $gameImageUrl = "";
+            $achievementsPageUrl = "#"; // Default link if no appid
 
-                    
-                    //image is wrapped in a tag because clicking it will link to that games achievements
-                    echo "<a href='" . htmlspecialchars($achievementsPageUrl) . "'title='View achievements for " . htmlspecialchars($gameName) . "'>";
-                    if ($gameImageUrl) { 
-                        echo "<img src='" . htmlspecialchars($gameImageUrl) . "' 
-                                   alt='" . htmlspecialchars($gameName) . " Library Capsule' 
-                                   class='game-library-image'
-                                   onerror=\"this.style.display='none'; this.nextSibling.style.display='inline-block'; console.error('Failed to load game image: " . htmlspecialchars($gameImageUrl) . " for AppID: " . htmlspecialchars($gameAppId) . "');\">";
-                        // This span is a placeholder if the image fails to load, but it's inside the link
-                        echo "<span class='img-error-placeholder' style='display:none;'>IMG</span>"; 
-                    } else {
-                        // This block executes if $gameImageUrl couldn't be formed (e.g., no AppID)
-                        // The placeholder itself is part of the link
-                        echo "<span class='img-error-placeholder'>N/A</span>";
-                    }
-                    echo "</a>"; 
-
-                    echo "<div class='game-details'>"; 
-                    echo "<span class='font-medium text-lg'>" . htmlspecialchars($gameName) . "</span>"; 
-                    echo "<span class='text-sm text-gray-500'>AppID: " . htmlspecialchars($gameAppId) . "</span>";
-                    echo "<span class='text-sm text-gray-600 mt-1'>Playtime: " . htmlspecialchars($playtimeHours) . " hours</span>";
-                    echo "</div>";
-                    echo "</li>";
-                }
-                echo "</ul>";
-            } elseif (!empty($ownedGamesData['message'])) {
-                echo "<p class='text-center text-gray-600 mt-6'>" . htmlspecialchars($ownedGamesData['message']) . "</p>";
-            } else {
-                echo "<p class='text-center text-gray-600 mt-6'>You do not seem to own any games, or your game library is private.</p>";
+            if ($gameAppId !== 'N/A') {
+                $gameImageUrl = "https://cdn.akamai.steamstatic.com/steam/apps/{$gameAppId}/library_600x900.jpg";
+                $achievementsPageUrl = "game_achievements.php?appid=" . urlencode($gameAppId); 
             }
-        ?>
+            
+            $safeAchievementsPageUrl = htmlspecialchars($achievementsPageUrl); // Sanitize the final URL for href
+            $safeGameImageUrl = htmlspecialchars($gameImageUrl); // Sanitize image URL for src
+
+            $imageHtml = "";
+            if ($gameImageUrl) { 
+                $imageHtml = "<img src='" . $safeGameImageUrl . "' " .
+                                 "alt='" . $safeGameName . " Library Capsule' " .
+                                 "class='game-library-image' " .
+                                 "onerror=\"this.style.display='none'; this.nextSibling.style.display='inline-block'; console.error('Failed to load game image: " . $safeGameImageUrl . " for AppID: " . $safeGameAppId . "');\">" .
+                             "<span class='img-error-placeholder' style='display:none;'>IMG</span>"; 
+            } else {
+                $imageHtml = "<span class='img-error-placeholder'>N/A</span>";
+            }
+
+
+            $listItem = "
+                <li class='game-list-item'>" .
+                    "<a href='" . $safeAchievementsPageUrl . "' class='game-library-image-link' title='View achievements for " . $safeGameName . "'>" .
+                        $imageHtml .
+                    "</a>" .
+                    "<div class='game-details'>" .
+                        "<span class='font-medium text-lg'>" . $safeGameName . "</span>" .
+                        "<span class='text-sm text-gray-500'>AppID: " . $safeGameAppId . "</span>" .
+                        "<span class='text-sm text-gray-600 mt-1'>Playtime: " . $safePlaytimeHours . " hours</span>" .
+                    "</div>" .
+                "</li>";
+            
+            echo $listItem;
+        }
+        
+        echo "</ul>"; // Close the unordered list
+    } elseif (!empty($ownedGamesData['message'])) {
+        echo "<p class='text-center text-gray-600 mt-6'>" . htmlspecialchars($ownedGamesData['message']) . "</p>";
+    } else {
+        echo "<p class='text-center text-gray-600 mt-6'>You do not seem to own any games, or your game library is private.</p>";
+    }
+?>
 
     <?php include 'footer.php'; ?>
 

@@ -33,11 +33,67 @@
 </head>
 <body>
     <?php include 'navbar.php'?>
-    <div>
-        <img src='<?php echo $avatar;?>'/>
-        <h2><?php echo $username;?></h2>
+    <div class="dashboard-main-container">
+        <div class="dashboard-column-1">
+            <div class="dashboard-user-card">
+                <img class="dash-profile-img" src='<?php echo $avatar;?>'/>
+
+                <div class="dashboard-user-info">
+                    <h2>Logged in as <?php echo $username;?></h2>
+                    <h2>placeholder</h2>
+                    <h2>placeholder</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-options">
+                <div class="dash-buttons">
+                    <button>
+                        <img src="Images/steam-icon.png" alt="games-btn">
+                        <h2>Games</h2>
+                    </button>
+                    <button>
+                        <img src="Images/steam-icon.png" alt="profile-btn">
+                        <h2>Profile</h2>
+                    </button>
+                    <button>
+                        <img src="Images/steam-icon.png" alt="achievements-btn">
+                        <h2>Achievements</h2>
+                    </button>
+                    <button>
+                        <img src="Images/steam-icon.png" alt="stats-btn">
+                        <h2>Stats</h2>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-column-2">
+            <div class="dash-leaderboard">
+                <h2>Leaderboard</h2>
+                <div class="leaderboard-contents">
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                    <p>placeholder</P>
+                </div>
+            </div>
+        </div>
     </div>
-    <a href="logout.php">Logout</a>
     <?php include 'footer.php'?>
 </body>
 <script src="javascript/bar-menu.js"></script>
