@@ -52,7 +52,9 @@
         exit();
     }
 
-    $steam_api_key = 'CF9C8D9F6B8A4AD8DBE9D6DB383949E5'; //my api key. Per the terms and conditions this is not to be shared!
+    require_once __DIR__ . '/steam-api-key.php';
+
+    $steam_api_key = steam_api_key; //api key is taken from a config file (steam-api-key) as legally it is not supposed to be shared
 
 
     //use steam id to get user data with api

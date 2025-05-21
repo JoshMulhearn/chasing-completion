@@ -1,20 +1,20 @@
 <?php
-    session_start(); // Start the session at the very beginning
+    session_start();
 
-    // --- Steam Web API Key ---
-    // !! IMPORTANT: Replace 'YOUR_STEAM_API_KEY' with your actual Steam Web API key.
-    // !! Store your API key securely, e.g., in an environment variable or a non-public config file.
-    $steam_api_key = 'CF9C8D9F6B8A4AD8DBE9D6DB383949E5'; // <<=== REPLACE THIS WITH YOUR ACTUAL KEY
+
+    require_once __DIR__ . '/steam-api-key.php';
+    $steam_api_key = steam_api_key; //api key is taken from a config file (steam-api-key) as legally it is not supposed to be shared
+
     $username = $_SESSION['userData']['name']; 
     $avatar = $_SESSION['userData']['avatar'];
 
-    // Check if the user is logged in; if not, redirect to an error page or login page
+    //vheck if the user is logged in
     if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         header("Location: Error.php"); // Or your login page
         exit();
     }
 
-    // Ensure userData and SteamID exist in the session
+    //rnsure userData and SteamID exist in the session
     if (!isset($_SESSION['userData']['steam_id'])) {
         error_log("Error in game_achievements.php: SteamID not found in session.");
         header("Location: Error.php?code=steamid_missing"); // Or your login page
@@ -23,71 +23,83 @@
     $steamID64 = $_SESSION['userData']['steam_id'];
     $username = $_SESSION['userData']['name'] ?? 'Player';
 
-    // Get the AppID from the URL query parameter
-    if (!isset($_GET['appid']) || !is_numeric($_GET['appid'])) {
-        // AppID is missing or not numeric, redirect or show error
-        // You might want a more user-friendly error page here
+    //get the AppID from the URL query parameter
+    if (!isset($_GET['appid']) || !is_numeric($_GET['appid'])) { //check if it exists and if its a number
+        //appID is missing or not numeric show error
         die("Error: Game AppID is missing or invalid.");
     }
-    $appId = filter_var($_GET['appid'], FILTER_VALIDATE_INT);
+    $appId = filter_var($_GET['appid'], FILTER_VALIDATE_INT); //appId is treated as an integer
 
-    // --- Fetch Player Achievements from Steam Web API ---
-    $achievementsData = null;
-    $gameName = 'Game'; // Default game name
+    //get the players achievements
+    $achievementsData = null; //this is going to hold the list of achievements
+    $gameName = 'Game'; //default game name which is updated by api
     $apiErrorMessage = '';
+    $gameCoverImageUrl = "https://placehold.co/300x450/2A475E/E0E0E0?text=Game+Cover"; // Placeholder
+    $completedAchievementsCount = 0; //implement for leaderboard!
+    $totalAchievementsForGame = 0; //this will be the total number of achievements for the game (total achievmeent count already does this no?)
+    $completionPercentage = 0; //implement for leaderboard!
 
-    if ($steam_api_key !== 'YOUR_STEAM_API_KEY' && !empty($steam_api_key)) {
-        $achievements_url = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?key={$steam_api_key}&steamid={$steamID64}&appid={$appId}&l=english&format=json";
-        
-        // Context options for file_get_contents, e.g., to set a timeout
-        $context_options = [
-            'http' => [
-                'timeout' => 10, // Timeout in seconds
-                'ignore_errors' => true // Fetch content even on HTTP errors to inspect body if needed
-            ],
-            // If you suspect SSL/TLS issues, you might need to configure SSL context options,
-            // but this can have security implications and should be understood before use.
-            // 'ssl' => [
-            //     'verify_peer' => false, // DANGEROUS: Disables SSL peer verification
-            //     'verify_peer_name' => false, // DANGEROUS: Disables SSL peer name verification
-            // ],
-        ];
-        $context = stream_context_create($context_options);
-        
-        $achievements_json = @file_get_contents($achievements_url, false, $context);
-
-        if ($achievements_json === false) {
-            $last_error = error_get_last();
-            $detailed_error = $last_error ? " (Details: " . htmlspecialchars($last_error['message']) . ")" : "";
-            $apiErrorMessage = "Could not connect to Steam API to fetch achievements. Please try again later." . $detailed_error;
-            error_log("Failed to fetch achievements for appid {$appId}, steamid {$steamID64}. Error: " . ($last_error['message'] ?? 'Unknown error'));
-        } else {
-            // Check HTTP status code if possible (requires more advanced HTTP client like cURL or Guzzle usually)
-            // For file_get_contents with ignore_errors, $http_response_header is populated.
-            // Example: sscanf($http_response_header[0], 'HTTP/%*d.%*d %d', $http_status_code);
-            // if ($http_status_code >= 400) { ... handle client/server HTTP errors ... }
-
-            $decoded_data = json_decode($achievements_json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $apiErrorMessage = "Error decoding JSON response from Steam API. Response was: " . htmlspecialchars(substr($achievements_json, 0, 200)) . "...";
-                error_log("JSON Decode Error for achievements appid {$appId}, steamid {$steamID64}. Error: " . json_last_error_msg() . ". Response: " . $achievements_json);
-            } elseif (isset($decoded_data['playerstats']['success']) && $decoded_data['playerstats']['success'] == true) {
-                $achievementsData = $decoded_data['playerstats']['achievements'] ?? [];
-                $gameName = htmlspecialchars($decoded_data['playerstats']['gameName'] ?? 'Game');
-                if (empty($achievementsData) && !isset($decoded_data['playerstats']['error'])) {
-                    $apiErrorMessage = "No achievements found for this game, or they haven't been set up for your account yet.";
-                }
-            } elseif (isset($decoded_data['playerstats']['error'])) {
-                $apiErrorMessage = "Steam API Error: " . htmlspecialchars($decoded_data['playerstats']['error']);
-            } else {
-                $apiErrorMessage = "Could not retrieve achievements. The game might not have achievements, or your profile settings might restrict access. Unexpected API response format.";
-                error_log("Unexpected API response for achievements appid {$appId}, steamid {$steamID64}: " . $achievements_json);
+    if (isset($_SESSION['userData']['owned_games']['games']) && is_array($_SESSION['userData']['owned_games']['games'])) 
+    {
+     
+        foreach ($_SESSION['userData']['owned_games']['games'] as $ownedGame) 
+        {
+           
+            if (isset($ownedGame['appid'], $ownedGame['name']) && $ownedGame['appid'] == $appId) 
+            {
+                $gameName = htmlspecialchars($ownedGame['name']);
+                $gameCoverImageUrl = "https://cdn.akamai.steamstatic.com/steam/apps/{$appId}/library_600x900.jpg";
+               
+                break;
             }
         }
-    } else {
-        $apiErrorMessage = "Steam API key is not configured by the site administrator. Achievements cannot be loaded.";
     }
 
+    if (!empty($steam_api_key)) //check api key is available
+    {
+        //need to handle differently to process-openId as there are cases where a game has no achievements and this would cause errors
+        $achievements_url = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?key={$steam_api_key}&steamid={$steamID64}&appid={$appId}&l=english"; //achievements url created from api
+        $raw_response = @file_get_contents($achievements_url);
+
+        if ($raw_response === false) //file_get_contents failed
+        {
+            $last_php_error = error_get_last(); //gets the last error and assigns it to variable. Api key was showing in error message on screen (not allowed)
+            $apiErrorMessage = "Could not retrieve achievements from Steam. The game may not have achievements, or there was a connection issue.";
+        }
+        else //file_get_contents was successful 
+        {
+            $achievements_response = json_decode($raw_response, true); //json_decode like in process-openId
+
+            if ($achievements_response === null) //json decoding failed
+            {
+                $apiErrorMessage = "Recieved invalid resposne format from Steam API";
+            } 
+            elseif (isset($achievements_response['playerstats']['success']) && $achievements_response['playerstats']['success'] === true)
+            //api call was successful
+            {
+                
+                $achievementsData = $achievements_response['playerstats']['achievements'] ?? []; //the achievements
+                
+                $totalAchievementsCount = count($achievementsData); //calculate the total number of achievements
+                //achievementsData is empty and achievements response is not set
+                if (empty($achievementsData) && !isset($achievements_response['playerstats']['error']))
+                {
+                    $apiErrorMessage = "There are no achievements for this game.";
+                }
+            }
+            else 
+            {
+                //unexpected issue
+                $apiErrorMessage = "Unexpected issue";
+            }
+        }
+    }
+    else 
+    {
+        $apiErrorMessage = "Steam API key not configured";
+    }
+
+    //error handling 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -100,158 +112,88 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/style.css"> 
-    <title><?php echo htmlspecialchars($gameName); ?> - Achievements</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        .achievement-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .achievement-item {
-            display: flex;
-            align-items: flex-start; /* Align items to the top */
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .achievement-item:last-child {
-            border-bottom: none;
-        }
-        .achievement-item.achieved {
-            background-color: #e6ffed; /* Light green for achieved */
-            border-left: 5px solid #4CAF50; /* Green accent */
-        }
-        .achievement-item.not-achieved {
-            background-color: #fff0f0; /* Light red for not achieved */
-            border-left: 5px solid #f44336; /* Red accent */
-            opacity: 0.8;
-        }
-        .achievement-icon {
-            width: 64px;
-            height: 64px;
-            margin-right: 15px;
-            border-radius: 4px;
-            object-fit: contain; /* So icons don't stretch */
-            flex-shrink: 0; /* Prevent icon from shrinking */
-        }
-        .achievement-details {
-            flex-grow: 1;
-        }
-        .achievement-name {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        .achievement-description {
-            font-size: 0.9em;
-            color: #555;
-            margin-bottom: 8px;
-        }
-        .achievement-status {
-            font-size: 0.8em;
-            font-style: italic;
-        }
-        .achieved .achievement-status {
-            color: #2e7d32; /* Darker green */
-        }
-        .not-achieved .achievement-status {
-            color: #c62828; /* Darker red */
-        }
-        .api-error-message {
-            color: #D8000C; /* Red for errors */
-            background-color: #FFD2D2; /* Light red background */
-            border: 1px solid #D8000C;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .page-title {
-            text-align: center;
-            margin-bottom: 30px;
-            font-family: 'Orbitron', sans-serif;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 15px;
-            background-color: #555;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        .back-link:hover {
-            background-color: #333;
-        }
-
-    </style>
+    <title><?php echo htmlspecialchars($gameName); ?> - Achievements</title> <!--games name is put in title of page with htmlspecialchars to ensure security-->
 </head>
 <body>
     <?php 
         include 'navbar.php'; // Assuming your navbar.php is in the same directory
     ?>
+    <!--decided not to use this-->
+    <!--<?php //if (!empty($apiErrorMessage)): ?>
+        <p class="api-error-message"><?//php echo $apiErrorMessage; ?></p>
+    <?php// endif; ?>   
+    -->
+    <div class="achievements-page-layout">
+        <div class="game-info">
+            <img src="<?php echo htmlspecialchars($gameCoverImageUrl); ?>" alt="<?php echo $gameName; ?> Cover Art" class="game-cover" onerror="this.onerror=null; this.src='https://cdn.akamai.steamstatic.com/steam/apps/{$gameAppId}/library_600x900.jpg';">
+            <p><?php echo $gameName?>  |  Title</p>
+            <?php 
+                if (isset($achievements_response['playerstats']['success']) && $achievements_response['playerstats']['success'] === true)
+                {
+                    echo "<p>" . $totalAchievementsCount . "  |  Achievements</p>";
+                    echo "<p>" . $completionPercentage . "%" . "  |  Your Progress</p>";
+                }
+                else
+                {
+                    echo "<p>N/A</p>";
+                    echo "<p>N/A</p>";
 
-    <div class="container">
-        <a href="games.php" class="back-link">&laquo; Back to Games List</a>
-        <h1 class="page-title">Achievements for <?php echo htmlspecialchars($gameName); ?></h1>
+                }
+            ?>
 
-        <?php if (!empty($apiErrorMessage)): ?>
-            <p class="api-error-message"><?php echo $apiErrorMessage; ?></p>
-        <?php endif; ?>
+        </div>
 
-        <?php if (empty($apiErrorMessage) && $achievementsData !== null && !empty($achievementsData)): ?>
-            <ul class="achievement-list">
+        <div class="achievements">
+            <ul>
                 <?php foreach ($achievementsData as $achievement): ?>
-                    <?php
-                        $isAchieved = (bool)($achievement['achieved'] ?? 0);
-                        $achievedClass = $isAchieved ? 'achieved' : 'not-achieved';
-                        $iconUrl = $isAchieved ? ($achievement['icon'] ?? '') : ($achievement['icongray'] ?? '');
-                        // Fallback if specific achieved/not-achieved icon is missing, use the general one
-                        if(empty($iconUrl) && isset($achievement['icon'])) $iconUrl = $achievement['icon'];
-                        if(empty($iconUrl) && isset($achievement['icongray'])) $iconUrl = $achievement['icongray'];
+                        <?php
+                            $apiNameForIcon = $achievement['apiname'] ?? null; 
+                            $achName = htmlspecialchars($achievement['displayName'] ?? $achievement['name'] ?? 'Unnamed Achievement'); // Steam uses displayName or name
+                            $achDesc = htmlspecialchars($achievement['description'] ?? 'No description available.');
+                            $isAchieved = (isset($achievement['achieved']) && $achievement['achieved'] == 1);
+                            $iconUrl = '';
+                            $unlockTime = $isAchieved && isset($achievement['unlocktime']) ? date('F j, Y, g:i a', $achievement['unlocktime']) : null;
 
-
-                        $displayName = htmlspecialchars($achievement['displayName'] ?? $achievement['name'] ?? 'Unnamed Achievement');
-                        $description = htmlspecialchars($achievement['description'] ?? 'No description available.');
-                        $unlockTimestamp = $achievement['unlocktime'] ?? 0;
-                        $unlockTimeFormatted = $isAchieved && $unlockTimestamp > 0 ? date('F j, Y \a\t g:i a', $unlockTimestamp) : 'Not unlocked';
-                    ?>
-                    <li class="achievement-item <?php echo $achievedClass; ?>">
-                        <?php if (!empty($iconUrl)): ?>
-                            <img src="<?php echo htmlspecialchars($iconUrl); ?>" alt="<?php echo $displayName; ?> icon" class="achievement-icon" onerror="this.style.display='none';">
-                        <?php else: ?>
-                            <div class="achievement-icon" style="background-color: #ccc; text-align:center; line-height:64px;">ICO</div> <?php endif; ?>
-                        <div class="achievement-details">
-                            <div class="achievement-name"><?php echo $displayName; ?></div>
-                            <div class="achievement-description"><?php echo $description; ?></div>
-                            <div class="achievement-status">
-                                <?php echo $isAchieved ? 'Achieved on: ' . $unlockTimeFormatted : 'Status: Locked'; ?>
-                            </div>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
+                            if($apiNameForIcon) 
+                            {
+                                $iconUrl = "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/{$appId}/{$apiNameForIcon}.jpg";
+                                $iconUrl = htmlspecialchars($iconUrl); 
+                            }
+                        ?>
+                            <li class="achievement-item <?php echo $isAchieved ? 'achieved' : 'not-achieved'; ?>">
+                                <?php if (!empty($iconUrl)): ?>
+                                    <img src="<?php echo $iconUrl; ?>" alt="<?php echo $achName; ?> Icon" class="achievement-icon" 
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"> <div class="achievement-icon-placeholder" style="width: 64px; height: 64px; background-color: #111; display:none; align-items:center; justify-content:center; font-size:10px; color:#555; border-radius: 3px; margin-right: 15px;">NO ICON</div>
+                                <?php else: ?>
+                                    <div class="achievement-icon-placeholder" style="width: 64px; height: 64px; background-color: #111; display:flex; align-items:center; justify-content:center; font-size:10px; color:#555; border-radius: 3px; margin-right: 15px;">NO ICON</div>
+                                <?php endif; ?>
+                                <div class="achievement-details">
+                                    <h4><?php echo $achName; ?></h4>
+                                    <p><?php echo $achDesc; ?></p>
+                                    <?php if ($unlockTime): ?>
+                                        <p class="unlock-time">Unlocked: <?php echo $unlockTime; ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </li>
+                    <?php endforeach; ?>
             </ul>
-        <?php elseif (empty($apiErrorMessage) && ($achievementsData === null || empty($achievementsData))): ?>
-            <p style="text-align:center;">This game may not have any achievements, or they could not be loaded.</p>
-        <?php endif; ?>
+        </div>
+
+        <div class="game-leaderboard">
+
+        </div>
+
+        <div class="admin-requests">
+        </div>
     </div>
+    
+
+
+
 
     <?php 
-        include 'footer.php'; // Assuming your footer.php is in the same directory
+        include 'footer.php';
     ?>
     </body>
+    <script src="javascript/bar-menu.js"></script>
 </html>

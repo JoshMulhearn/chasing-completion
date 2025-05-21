@@ -48,7 +48,7 @@
             <div class="dashboard-options">
                 <div class="dash-buttons">
                     <button>
-                        <img src="Images/steam-icon.png" alt="games-btn">
+                        <img src="Images/controller_bigger.svg" alt="games-btn">
                         <h2>Games</h2>
                     </button>
                     <button>
