@@ -1,6 +1,8 @@
 *{
     padding: 0;
     margin: 0;    
+    font-family: "roboto";
+
 }
 
 body {
@@ -8,9 +10,10 @@ body {
     background-color: #1B2838;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
+    min-height: 100vh; /*ensure body takes at least full viewport height */
 
 }
+
 
 /*Index Page*/
 
@@ -163,144 +166,124 @@ body {
 
 /*dashboard.php*/
 
-.dashboard-main-container {
-    display: flex;
-    margin: auto; /* Center the container on the page */
-}
 
-.dashboard-column-1 {
-    flex: 2;
-}
-
-.dashboard-column-2 {
-    flex: 1;
-}
-
-.dash-leaderboard {
-    background-color: #171A21;
-    display: flex;
-    justify-content: center;
-    margin: 20px;
-    align-items: center;
-    flex-direction: column;
-    width: 425px;
-    height: 420px;
-}
-
-.dashboard-user-card {
-    background-color: #171A21;
-    width: 850px;
-    margin: 20px;
-    display: flex;
-    padding: 10px;
-    align-items: center;
-}
-
-.dashboard-user-card .dash-profile-img {
-    width: 100px;
-    height: 100px;
-
-}
-
-.dashboard-user-card h2 {
-    color: white;
-    font-family: 'roboto';
-    margin-left: 20px;
-
-}
-
-.dashboard-options {
-    background-color: #171A21;
-    width: 850px;
-    margin: 20px;
-    padding: 10px;
-}
-
-.dash-buttons {
-    display: flex;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.dash-buttons button{
-    background-color: #2A475E;
-    border: none;
-    height: 100px;
-    width: 250px;
-    margin: 10px;
-}
-
-.dash-buttons h2{
-    font-family: 'genos';
-    color: white;
-}
-
-.dash-buttons img {
-    height: 50px;
-    width: 100px;
-}
-
-.dash-leaderboard h2 {
-    font-family: 'genos';
-    color: white;
-    margin-bottom: 10px;
-}
-
-.leaderboard-contents {
-    background-color: #2A475E;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
 /*games.php styling*/
 
-.search-and-filter-container .your_games_count {
-    font-family: 'genos';
-    font-size: 30px;
-    margin-left: 30px;
+.search-and-filter-container {
+    margin: 30px 0 0 30px;
+}
+
+.search-and-filter-container h2 {
+    margin-left: 20px;
     color: white;
 }
 
-.search-and-filter-container{
-    width: 600px;
-    height: 100px;
-    margin-left: 50px;
-    margin-top: 50px;
-    padding: 20px;
+.search-container {
     display: flex;
-    flex-direction: column;
-}
-
-.search-and-filter-container .search-container {
     background-color: #171A21;
-    height: 50px;
     width: 600px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 30px;
     align-items: center;
-    border-radius: 40px;
+    margin-bottom: 20px;
 }
 
-.search-container input{
-    margin-left: 30px;
-    border-radius: 40px;
-    height: 25px;
-    font-family: 'roboto';
+.search-container input {
+    margin-left: 20px;
+    margin-right: 50px;
+    border: 1px solid white;
+    border-radius: 20px;
 }
 
-.search-container p{ /*This wont be p forever this is just placeholder*/
-    margin-right: 60px;
+#no-games-found {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2em;
     color: white;
-    font-family: 'roboto';
+    display: none;
 }
 
+.search-container label {
+     margin-right: 10px; 
+     
+} 
+.search-container input[type=text] {
+    padding: 5px;
+    font-family: "roboto";
+    color: #171A21;
+}
+
+.games-list-container {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+    padding: 0; 
+    margin: 0; 
+}
+
+.game-list-item {
+
+    padding: 10px;
+    box-sizing: border-box; 
+}
+
+.game-list-item a {
+    display: block;   
+    width: 300px;     
+    height: 450px;    
+    overflow: hidden; 
+    background-color: #171A21; 
+
+}
+
+.game-library-image {
+    width: 100%;    
+    height: 100%;     
+    object-fit: cover;
+    display: block;
+}
+
+
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #171A21; /* Steam-like dark blue */
+    z-index: 9999; /*infront*/
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    font-family: 'Roboto';
+}
+
+.loading-spinner {
+    border: 5px solid #c7d5e0;
+    border-top: 5px solid #171A21; 
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading-screen p {
+    font-size: 1.2em;
+}
 /*game achievements*/
+
+
 
 .api-error-message {
     margin: auto;
@@ -309,16 +292,203 @@ body {
     font-size: 20px;
 }
 
-.game-info {
-    padding: 20px;
-    flex: 0 0 300px;
-}
-.game-info p{
+.page-header-container {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    border-top: 1px solid white;
+    background-color: #171A21;
     color: white;
-    font-family: "roboto";
-    font-size: 15px;
+    font-family: "genos";
+    margin-bottom: 20px;
 }
 
-.achievements {
-    flex: 2;
+.page-header-container h2 {
+    margin-left: 20px;
 }
+
+.achievements-page-layout {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.page-header-container a {
+    text-decoration: none;
+    color: white;
+    font-size: 15px;
+    border: 1px solid white;
+    padding: 8px;
+    border-radius: 20px;
+    background-color: #2A475E;
+}
+
+    /*Game info column*/
+.game-info-column {
+    background-color: #171A21;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid white;
+    width: 300px;
+    color: white;
+    font-family: "roboto";
+    text-align: center;
+    align-items: center;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    
+}
+
+
+.game-info-column img { /*have to set image to correct size*/
+    width: 300px;
+    height: 450px;
+
+
+}
+
+.game-info-column h2, .game-info-column p{
+    margin-top: 10px;
+    padding: 4px;
+}
+
+.game-info-column h2 {
+    text-decoration: underline;
+}
+
+
+
+.game-info-column .game-completion-stats {
+    border-top: 1px solid white;
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+
+    /*achievements column*/
+.achievements-column {
+    background-color: #171A21;
+    padding: 20px;
+    color: white;
+    height: 807px; /*exact height of game-info according to devtools*/
+    width: 800px;
+    margin-bottom: 20px;
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.achievements-column .ach-colum-title {
+    font-family: "genos";
+    text-align: center;
+    margin: auto 0 auto 0;
+    font-size: 40px;
+}
+
+.achievements-list { /*ul*/
+    background-color: #2A475E;
+    padding: 20px;
+    list-style: none;
+    height: 80%;
+    overflow-y: scroll;
+    border: 1px solid white;
+}
+
+.achievement-item { /*li*/
+    display: flex;
+    flex-direction: row;
+    background-color: #171A21;
+    margin-bottom: 20px;
+    align-items: center;
+    padding: 10px;
+
+}
+
+.achievement-details { 
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.achievement-details .unlock-time {
+    color: #4CAF50;
+}
+
+.achievement-item.achieved {
+    border-left: 5px solid #4CAF50; 
+
+}
+
+.achievement-item img { /*icon sizing needs fixed*/
+    width: 64px;
+    height: 64px;
+}
+
+    /*right column (leaderboard and admin*/
+.right-sidebar-column {
+    margin-right: 20px;
+    width: 400px;
+    height: 807px;
+    
+}
+
+.game-leaderboard-panel {
+    background-color: #171A21;
+    color: white;
+    font-family: "roboto";
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+    border: 1px solid white;
+}
+
+.game-leaderboard-panel h2 {
+    color: white;
+    font-family: "genos";
+    font-size: 40px;
+    text-align: center;
+}
+
+.leaderboard-list {
+    background-color: #2A475E;
+    overflow-y: scroll;
+    height: 80%;
+    width: 80%;
+}
+
+.admin-actions-panel {
+    display: flex;
+    background-color: #171A21;
+    margin-top: 38px; /*might need to change sizings so that all sizes of columns are the same*/
+    border: 1px solid white;
+    height: 50%;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-btns{
+
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.admin-btns a {
+    display: flex;
+    text-decoration: none;
+    color: white;
+    font-family: "roboto";
+    background-color: #2A475E;
+    padding: 50px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    border-radius: 30px;
+}
+
+.admin-btns a:last-child {
+    margin-top: 30px;
+}
+

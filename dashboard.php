@@ -11,6 +11,8 @@
     //variables from process-openId
     $username = $_SESSION['userData']['name']; 
     $avatar = $_SESSION['userData']['avatar'];
+    $steamID64 = isset($_SESSION['userData']['steam_id']) ? $_SESSION['userData']['steam_id'] : null;
+    
 ?>
 
 
@@ -33,67 +35,31 @@
 </head>
 <body>
     <?php include 'navbar.php'?>
-    <div class="dashboard-main-container">
-        <div class="dashboard-column-1">
-            <div class="dashboard-user-card">
-                <img class="dash-profile-img" src='<?php echo $avatar;?>'/>
 
-                <div class="dashboard-user-info">
-                    <h2>Logged in as <?php echo $username;?></h2>
-                    <h2>placeholder</h2>
-                    <h2>placeholder</h2>
-                </div>
-            </div>
-
-            <div class="dashboard-options">
-                <div class="dash-buttons">
-                    <button>
-                        <img src="Images/controller_bigger.svg" alt="games-btn">
-                        <h2>Games</h2>
-                    </button>
-                    <button>
-                        <img src="Images/steam-icon.png" alt="profile-btn">
-                        <h2>Profile</h2>
-                    </button>
-                    <button>
-                        <img src="Images/steam-icon.png" alt="achievements-btn">
-                        <h2>Achievements</h2>
-                    </button>
-                    <button>
-                        <img src="Images/steam-icon.png" alt="stats-btn">
-                        <h2>Stats</h2>
-                    </button>
-                </div>
-            </div>
+    <div class="dashboard-page-layout">
+        <div class="user-card">
+            <img class="user-avatar" src="<?php echo $avatar; ?>" alt="<?php echo $username; ?>'s Avatar">
+            <h2>Logged in as <?php echo $username; ?></h2>
         </div>
-        <div class="dashboard-column-2">
-            <div class="dash-leaderboard">
-                <h2>Leaderboard</h2>
-                <div class="leaderboard-contents">
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                    <p>placeholder</P>
-                </div>
-            </div>
+
+        <div class="dashboard-links">
+            <a href="games.php">Games</a>
+            <a href="profile.php">Profile</a>
+            <a href="user-stats.php">Stats</a>
+        </div>
+
+        <div class="dash-leaderboard">
+            <h2>Leaderboard</h2>
+            <ol class="leaderboard-list">
+                <li class="leaderboard-item">
+                    <span class="rank">#<?php echo $index + 1; ?></span>
+                    <span class="username" title="<?php echo htmlspecialchars($entry['username']); ?>"><?php echo htmlspecialchars($entry['username']); ?></span>
+                    <span class="completion"><?php echo $entry['completion']; ?>%</span>
+                </li>
+            </ol>
         </div>
     </div>
+
     <?php include 'footer.php'?>
 </body>
 <script src="javascript/bar-menu.js"></script>

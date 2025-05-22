@@ -1,15 +1,16 @@
 <?php
-    //server name variables
-    $my_host = "127.0.0.1";
-    $my_db = "chasing_completion_db";
-    $my_db_username = "root";
-    $my_db_password = "";
+    // db_connect.php
+    define('DB_SERVER', 'localhost'); // or your db host
+    define('DB_USERNAME', 'your_db_username');
+    define('DB_PASSWORD', 'your_db_password');
+    define('DB_NAME', 'your_db_name');
 
-    try {
-        $DB = new PDO("mysql:host=$my_host;dbname=$my_db", $my_db_username, $my_db_password);
+    $db_link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
-    }
-    catch (Exception $ex){
-        echo $ex->getMessage();
+    if($db_link === false){
+        error_log("ERROR: Could not connect to MySQL. " . mysqli_connect_error());
+        // In a real app, you might handle this more gracefully than letting the script continue
+    } else {
+        mysqli_set_charset($db_link, "utf8mb4"); // Good practice
     }
 ?>
