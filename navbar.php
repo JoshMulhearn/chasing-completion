@@ -1,22 +1,4 @@
-<?php     
-    if (session_status() == PHP_SESSION_NONE) 
-    //since navbar is included in every page and a session may have already been started, 
-    // this code only starts a session when one hasnt already been created 
-    {
-        session_start();
-    }
 
-    //default home link is index.php
-    $home_link = "index.php";
-
-    if(isset($_SESSION['logged_in']))
-    {
-        //home link changes to dashboard.php when user is logged in
-        $home_link = "dashboard.php";
-    }
-
-
-?>
 
 <nav class="navbar">
     

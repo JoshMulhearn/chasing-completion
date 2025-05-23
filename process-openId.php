@@ -78,6 +78,7 @@
         'steam_id'    => $playerSum['steamid'],
         'name'        => $playerSum['personaname'],
         'avatar'      => $playerSum['avatarmedium'],
+        'timecreated' => $playerSum['timecreated'] ?? null,
     ];
 
     // Add owned games data as the full array which will be looped through for specific data

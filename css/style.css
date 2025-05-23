@@ -169,10 +169,10 @@ body {
 
 .dashboard-page-container {
     display: flex;
-    justify-content: center; /* Horizontally centers .dashboard-main-content */
-    align-items: center;     /* Vertically centers .dashboard-main-content */
-     /* Padding around the main content block */
-    flex-grow: 1;            /* Allows this container to take available vertical space if body is flex */
+    justify-content: center; 
+    align-items: center;   
+
+    flex-grow: 1;           
     width: 100%;            
 
 }
