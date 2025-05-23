@@ -38,7 +38,7 @@
     $result = file_get_contents('https://steamcommunity.com/openid/login', false, $context);
 
 
-    // check result is valid
+    //check result is valid
     if(preg_match("#is_valid\s*:\s*true#i", $result))
     {
         preg_match('#^https://steamcommunity.com/openid/id/([0-9]{17,25})#', $_GET['openid_claimed_id'], $matches);
@@ -93,7 +93,7 @@
         //if no games list is empty
     }
 
-    $redirect_url = "dashboard.php";
+    $redirect_url = "loading.php";
     header("Location: $redirect_url"); 
     exit();
 ?>

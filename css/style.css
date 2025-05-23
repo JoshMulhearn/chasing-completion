@@ -2,6 +2,7 @@
     padding: 0;
     margin: 0;    
     font-family: "roboto";
+    
 
 }
 
@@ -167,206 +168,172 @@ body {
 /*dashboard.php*/
 
 .dashboard-page-container {
-    max-width: 980px; 
-    margin: 30px auto; 
-    padding: 0 20px;
-}
-
-.dashboard-main-content {
     display: flex;
-    gap: 25px; /* Space between left and right columns */
+    justify-content: center; /* Horizontally centers .dashboard-main-content */
+    align-items: center;     /* Vertically centers .dashboard-main-content */
+     /* Padding around the main content block */
+    flex-grow: 1;            /* Allows this container to take available vertical space if body is flex */
+    width: 100%;            
+
+}
+.dashboard-main-content{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 150px;
+    flex-wrap: wrap;
+
 }
 
 .dashboard-left-column {
-    flex: 2; /* Takes up more space */
+
     display: flex;
     flex-direction: column;
-    gap: 25px; /* Space between user card and nav panel */
+    gap: 20px;
+    
 }
 
 .dashboard-right-column {
-    flex: 1; /* Takes less space */
+
+    height: 450px;
 }
 
-/* === USER CARD PANEL === */
-.user-card-panel {
-    background-color: #2a475e; /* Medium Blue-Gray */
-    padding: 20px;
-    border-radius: 8px;
+.user-card {
     display: flex;
-    align-items: center;
-}
-
-.user-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 6px;
-    object-fit: cover;
-    margin-right: 20px;
-    border: 2px solid #1b2838; /* Optional border */
-}
-
-.user-details h2 {
-    font-size: 1.15em; /* ~16px */
-    color: #FFFFFF; /* Pure white for emphasis */
-    font-weight: 500;
-    margin: 0 0 5px 0;
-}
-
-.user-details p {
-    font-size: 0.9em; /* ~12.6px */
-    color: #c7d5e0;
-    margin: 0 0 3px 0;
-}
-
-/* === DASHBOARD NAVIGATION PANEL === */
-.dashboard-navigation-panel {
-    background-color: #2a475e; /* Medium Blue-Gray */
     padding: 20px;
-    border-radius: 8px;
-    display: grid; /* Using grid for the button layout */
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive columns */
-    gap: 15px;
+    background-color: #171A21;
+    color: white;
+    border: 1px solid white;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.nav-button {
-    background-color: #1b2838; /* Darker blue for buttons */
-    color: #c7d5e0;
+.user-card img {
+    height: 64px;
+    width: 64px;
+}
+
+.user-details {
+    padding: 0 10px 0 10px;
+}
+
+.dashboard-navigation {
+    background-color: #171A21;
+    padding: 20px;
+    border: 1px solid white;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+
+
+.dashboard-navigation a{
     text-decoration: none;
-    padding: 15px 10px;
-    border-radius: 6px;
+    color: white;
+    background-color: #2A475E;
+    border: 1px solid white;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    padding: 10px;
+    width: 150px;
+}
+
+.dashboard-navigation a:hover {
+    background-color: #1B2838;
+    transition:ease 0.5s;
+}
+
+.dashboard-navigation h3 {
+    font-family: "genos";
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-navigation img {
+    display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-    min-height: 90px;
-    border: 1px solid #171a21; /* Very dark border */
+    object-fit: cover;
+    height: 64px;
+    width: 64px;
 }
 
-.nav-button:hover {
-    background-color: #66c0f4; /* Light Blue on hover */
-    color: #171a21; /* Dark text on hover */
-    transform: translateY(-2px);
-}
-.nav-button:hover img {
-    filter: invert(10%) sepia(10%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(100%); /* Attempt to make icon dark on light blue bg */
-}
-
-
-.nav-button img {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 8px;
-    /* Assuming white SVGs initially */
-    filter: brightness(0) invert(1); /* This makes black SVGs white. If already white, remove or adjust */
-}
-
-.nav-button span {
-    font-size: 0.95em; /* ~13.3px */
-    font-weight: 500;
-}
-
-/* === LEADERBOARD PANEL === */
-.leaderboard-panel {
-    background-color: #2a475e; /* Medium Blue-Gray */
+.web-info {
+    background-color: #171A21;
+    border: 1px solid white;
     padding: 20px;
-    border-radius: 8px;
-    height: 100%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    gap: 30px;
+}
+
+.info-box {
+    background-color: #2A475E;
+    padding: 20px;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    border: 1px solid white;
+}
+
+.web-info h2 {
+    font-family: "genos";
+
+}
+
+
+.leaderboard-panel {
+    background-color: #171A21;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box; /* Important for height 100% with padding */
+    align-items: center;
+    border: 1px solid white;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.leaderboard-panel h3 {
-    font-size: 1.25em; /* ~17.5px */
-    color: #FFFFFF; /* Pure White */
-    font-weight: 500;
-    margin: 0 0 15px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #1b2838; /* Dark Blue separator */
+.leaderboard-panel h2 {
+    color: white;
+    font-family: "genos";
+    margin-bottom: 10px;
 }
 
 .leaderboard-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto; 
-    flex-grow: 1; 
+    border: 1px solid white;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+
+    justify-content: center;
 }
 
 .leaderboard-item {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    padding: 10px 5px; 
-    border-bottom: 1px solid #1b2838; /* Dark Blue separator */
-}
-.leaderboard-item:last-child {
-    border-bottom: none;
-}
-
-.leaderboard-rank {
-    color: #66c0f4; /* Light Blue for rank */
-    font-weight: 700;
-    font-size: 0.9em;
-    width: 30px; 
-    text-align: left;
-    flex-shrink: 0; /* Prevent rank from shrinking */
+    padding: 10px;
+    background-color: #171A21;
+    width: 100%;
+    color: white;
+    font-family: "roboto";
+    border: 1px solid white;
+    height: 20%;
 }
 
-.leaderboard-avatar-small {
-    width: 32px; 
-    height: 32px;
-    border-radius: 4px;
-    object-fit: cover;
-    margin-left: 10px;
-    margin-right: 10px;
-    background-color: #1b2838; /* Fallback bg if image fails */
-}
-
-.leaderboard-user-info {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden; /* For text ellipsis */
-}
-
-.leaderboard-username {
-    color: #FFFFFF; /* Pure White */
-    font-size: 0.9em;
-    font-weight: 500;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.leaderboard-metric { /* Renamed from games-completed for generic use if needed */
-    color: #c7d5e0; /* Light Gray */
-    font-size: 0.8em;
-}
-.leaderboard-empty {
-    color: #c7d5e0;
-    text-align: center;
-    padding: 20px;
-}
-
-/* Optional: Custom Scrollbar for Webkit browsers */
-.leaderboard-list::-webkit-scrollbar {
-    width: 8px;
-}
-.leaderboard-list::-webkit-scrollbar-track {
-    background: #1b2838; 
-    border-radius: 4px;
-}
-.leaderboard-list::-webkit-scrollbar-thumb {
-    background-color: #66c0f4; /* Light Blue scrollbar thumb */
-    border-radius: 4px;
-    border: 2px solid #1b2838;
-}
-.leaderboard-list::-webkit-scrollbar-thumb:hover {
-    background-color: #87CEFA; /* Lighter blue on hover */
+.leaderboard-item p, .leaderboard-item img {
+    padding: 0 0 0 10px;
 }
 /*games.php styling*/
 
@@ -511,7 +478,7 @@ body {
 .achievements-page-layout {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
+
 }
 
 .page-header-container a {
@@ -571,7 +538,7 @@ body {
     padding: 20px;
     color: white;
     height: 807px; /*exact height of game-info according to devtools*/
-    width: 800px;
+    width: 600px;
     margin-bottom: 20px;
     border: 1px solid white;
     display: flex;
@@ -692,4 +659,6 @@ body {
 .admin-btns a:last-child {
     margin-top: 30px;
 }
+
+/*User Stats*/
 

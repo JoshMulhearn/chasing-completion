@@ -19,12 +19,12 @@
     $current_avatar_url = isset($_SESSION['userData']['avatar']) ? htmlspecialchars($_SESSION['userData']['avatar']) : 'Images/default_avatar.png';
     $current_steamID64 = isset($_SESSION['userData']['steam_id']) ? $_SESSION['userData']['steam_id'] : null;
 
-    require_once __DIR__ . '/steam-api-key.php'; // For Steam API calls
+    require_once __DIR__ . '/steam-api-key.php';//api key
     $steam_api_key = defined('steam_api_key') ? steam_api_key : null;
     
-    require_once __DIR__ . '/db_connect.php'; // For Database interaction
+    require_once __DIR__ . '/db_connect.php';//database connection
 
-    // --- Utility Functions ---
+    
     function getAndCacheGameSchema($appId, $current_steam_api_key, $cacheDir = 'cache/', $cacheDuration = 86400) { 
         if (!$current_steam_api_key) return [];
         $cacheFile = rtrim($cacheDir, '/') . '/schema_' . $appId . '.json';
@@ -63,7 +63,7 @@
             return;
         }
 
-        foreach ($_SESSION['userData']['owned_games']['games'] as $ownedGame) {
+        foreach ($_SESSION['userData']['owned_games']['games'] as $ownedGame) { //calculate user achievements total for each game. this is what takes a while to load
             if (!isset($ownedGame['appid'])) continue;
             $appId = $ownedGame['appid'];
             $gameSchema = getAndCacheGameSchema($appId, $api_key);
@@ -82,8 +82,8 @@
                             }
                         }
                     }
-                } // else { error_log("calculateUserStats: Failed to fetch player achievements for appID {$appId}."); }
-                usleep(50000); // 50ms delay
+                } 
+                usleep(50000); //50ms delay
             }
             $out_total_ach_earned_count += $achievedCountForThisGame;
             if ($totalAchievementsInSchema > 0 && $achievedCountForThisGame === $totalAchievementsInSchema) {
@@ -97,6 +97,7 @@
              error_log("updateUserStatsInDB: Database connection error.");
              return false;
         }
+        //sql to update the users info to ensure games completed number updates if it goes up
         $sql = "INSERT INTO users (steam_id, username, avatar_url, games_completed_100_percent, total_achievements_earned) 
                 VALUES (?, ?, ?, ?, ?) 
                 ON DUPLICATE KEY UPDATE 
@@ -128,7 +129,7 @@
             error_log("getLeaderboardData: Database connection error.");
             return $leaderboard;
         }
-        // Order by games_completed_100_percent first, then by total_achievements_earned for tie-breaking
+        //order by games_completed_100_percent first, then by total_achievements_earned for tie-breaking
         $sql = "SELECT steam_id, username, avatar_url, games_completed_100_percent 
                 FROM users 
                 ORDER BY games_completed_100_percent DESC, total_achievements_earned DESC 
@@ -153,10 +154,10 @@
         return $leaderboard;
     }
 
-    // --- Main Stats Logic ---
+    //stats logic
     $games_completed_count_display = 0;
     $achievements_earned_display = 0;
-    $STATS_CACHE_DURATION = 3600 * 6; // Cache user stats in session for 6 hours
+    $STATS_CACHE_DURATION = 3600 * 6; //cache user stats in session for 6 hours
 
     if (isset($_SESSION['dashboard_stats']['games_100_count'], $_SESSION['dashboard_stats']['total_ach_earned'], $_SESSION['dashboard_stats']['stats_last_updated']) &&
         (time() - $_SESSION['dashboard_stats']['stats_last_updated'] < $STATS_CACHE_DURATION)) {
@@ -174,13 +175,13 @@
         $_SESSION['dashboard_stats']['stats_last_updated'] = time();
         error_log("Dashboard: Recalculated and SESSION cached stats for user {$current_steamID64}. Games 100%: {$games_completed_count_display}, Total Ach: {$achievements_earned_display}.");
 
-        // Update database after recalculating stats
+        //update database after recalculating stats
         if ($db_link && $current_steamID64) {
             updateUserStatsInDB($current_steamID64, $current_username, $current_avatar_url, $games_completed_count_display, $achievements_earned_display, $db_link);
         }
     }
 
-    // Fetch Leaderboard Data
+    //fetch Leaderboard Data
     $leaderboardEntries = [];
     if ($db_link) {
         $leaderboardEntries = getLeaderboardData($db_link, 6); // Get top 6 for display
@@ -188,7 +189,7 @@
         error_log("Dashboard: Not fetching leaderboard due to DB connection issue.");
     }
     
-    // Close DB connection if it was opened
+    //close DB connection if it was opened
     if ($db_link) {
         mysqli_close($db_link);
     }
@@ -199,21 +200,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--FONTS-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Genos:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!---->
+    <!--STYLE SHEETS-->
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/style.css">
+    <!---->
     <title>Chasing Completion - Dashboard</title>
 </head>
 <body>
     <?php include 'navbar.php'?>
 
-    <div class="dashboard-page-container"> {/* Renamed for clarity */}
+    <div class="dashboard-page-container">
         <div class="dashboard-main-content">
             <div class="dashboard-left-column">
-                <div class="user-card-panel">
+
+                <div class="user-card">
                     <img class="user-avatar" src="<?php echo $current_avatar_url; ?>" alt="<?php echo $current_username; ?>'s Avatar">
                     <div class="user-details">
                         <h2>Logged in as <?php echo $current_username; ?></h2>
@@ -222,35 +228,40 @@
                     </div>
                 </div>
 
-                <div class="dashboard-navigation-panel">
+                <div class="dashboard-navigation">
                     <a href="games.php" class="nav-button">
-                        <img src="Images/icon_games_white.svg" alt="Games"> {/* UPDATE PATH */}
-                        <span>Games</span>
+                        <img src="Images/controller.png" alt="Games">
+                        <h3>Games</h3>
                     </a>
-                    <a href="profile.php" class="nav-button"> {/* UPDATE PATH if different */}
-                        <img src="Images/icon_profile_white.svg" alt="Profile"> {/* UPDATE PATH */}
-                        <span>Profile</span>
+                    <a href="profile.php" class="nav-button"> 
+                        <img src="Images/profile-dash.png" alt="Profile">
+                        <h3>Profile</h3>
                     </a>
-                    <a href="stats_summary.php" class="nav-button"> {/* UPDATE PATH if different */}
-                        <img src="Images/icon_stats_white.svg" alt="Stats"> {/* UPDATE PATH */}
-                        <span>Stats</span>
+                    <a href="user-stats.php" class="nav-button">
+                        <img src="Images/stats-dash.png" alt="Stats"> 
+                        <h3>Stats</h3>
                     </a>
-                    {/* Achievements button is intentionally omitted as per request */}
+                </div>
+
+                <div class="web-info">
+                    <h2>Website Info</h2>
+                    <p>Website development finished!</p>
                 </div>
             </div>
+            
 
             <div class="dashboard-right-column">
                 <div class="leaderboard-panel">
-                    <h3>Leaderboard</h3>
+                    <h2>Leaderboard</h2>
                     <ul class="leaderboard-list">
                         <?php if (!empty($leaderboardEntries)): ?>
                             <?php foreach($leaderboardEntries as $entry): ?>
                             <li class="leaderboard-item">
-                                <span class="leaderboard-rank">#<?php echo $entry['rank']; ?></span>
+                                <p class="leaderboard-rank">#<?php echo $entry['rank']; ?></p>
                                 <img class="leaderboard-avatar-small" src="<?php echo htmlspecialchars($entry['avatar_url'] ?? 'Images/leaderboard_avatar_placeholder.png'); ?>" alt="<?php echo htmlspecialchars($entry['username']); ?>'s Avatar">
                                 <div class="leaderboard-user-info">
-                                    <span class="leaderboard-username"><?php echo htmlspecialchars($entry['username']); ?></span>
-                                    <span class="leaderboard-metric">Games Completed: <?php echo $entry['games_completed_100_percent']; ?></span>
+                                    <p class="leaderboard-username"><?php echo htmlspecialchars($entry['username']); ?></p>
+                                    <p class="leaderboard-metric">Games Completed: <?php echo $entry['games_completed_100_percent']; ?></p>
                                 </div>
                             </li>
                             <?php endforeach; ?>
