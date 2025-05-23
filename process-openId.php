@@ -94,8 +94,12 @@
         //if no games list is empty
     }
 
+    //forces dashboard.php to recalculate
+    //this ensures logging out and logging back in doesnt break dashboard.php
+    unset($_SESSION['dashboard_stats']);
+    error_log("process-openId.php: Cleared any existing \$_SESSION['dashboard_stats'] for fresh calculation for user {$steamID64}.");
+
     $redirect_url = "loading.php";
     header("Location: $redirect_url"); 
     exit();
 ?>
-
