@@ -314,9 +314,10 @@ body {
     border: 1px solid white;
     padding: 20px;
     overflow-y: auto;
-    display: flex;
 
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+
 }
 
 .leaderboard-item {
@@ -329,7 +330,9 @@ body {
     color: white;
     font-family: "roboto";
     border: 1px solid white;
-    height: 20%;
+
+    box-sizing: border-box;
+    margin-bottom: 8px;
 }
 
 .leaderboard-item p, .leaderboard-item img {

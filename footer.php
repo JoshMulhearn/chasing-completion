@@ -7,9 +7,8 @@
         </div>
         <div class="footer-column">
             <ul>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms and Conditions</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="https://steamcommunity.com/dev/apiterms">SteamAPI Terms of Use</a></li>
                 <li><a href="admin-login.php">Admin Login</a></li>
             </ul>
         </div>
