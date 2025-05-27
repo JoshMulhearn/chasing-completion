@@ -663,5 +663,61 @@ body {
     margin-top: 30px;
 }
 
-/*User Stats*/
+/*Profile.php*/
 
+.profile-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.profile-user-card {
+    background-color: #171A21;
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-user-avatar {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 1px white solid;
+}
+
+.profile-user-details {
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.profile-section {
+    background-color: #171A21;
+    border: 1px solid white;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 1000px;
+}
+
+.game-covers-grid {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid white;
+    background-color: #2A475E;
+    justify-content: center;
+}
+
+.game-cover-item {
+    margin: 10px;
+}
+
+.profile-section h3 {
+    color: white;
+    font-family: "genos";
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 10px;
+}

@@ -1,45 +1,52 @@
 <?php
     session_start();
-    // ini_set('display_errors', 1); 
-    // error_reporting(E_ALL);    
+    // ini_set('display_errors', 1); // Keep for debugging if needed
+    // error_reporting(E_ALL);
 
-    if(!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']){ /* ... redirect ... */ exit(); }
-    if (!isset($_SESSION['userData'])) { /* ... redirect ... */  exit(); }
-    
-    // Default dashboard_stats if not set by get_dashboard_data.php (e.g., if loading.php was skipped)
-    if (!isset($_SESSION['dashboard_stats'])) { 
-        error_log("PROFILE.PHP: dashboard_stats not found in session. Using defaults.");
-        $_SESSION['dashboard_stats'] = [
-            'games_100_count' => 0, 
-            'total_ach_earned' => 0, 
-            'completed_100_showcase_games' => [] // Ensure this key exists even if empty
-        ];
+    if(!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']){
+        header("Location: Error.php?code=not_logged_in_profile"); // More specific error
+        exit();
     }
-    
-    $username = isset($_SESSION['userData']['name']) ? htmlspecialchars($_SESSION['userData']['name']) : 'Guest'; 
+    if (!isset($_SESSION['userData'])) {
+        header("Location: Error.php?code=session_data_missing_profile"); // More specific error
+        exit();
+    }
+
+    // User details
+    $username = isset($_SESSION['userData']['name']) ? htmlspecialchars($_SESSION['userData']['name']) : 'Guest';
     $avatar = isset($_SESSION['userData']['avatar']) ? htmlspecialchars($_SESSION['userData']['avatar']) : 'Images/default_avatar.png';
 
-    // Stats from dashboard's session cache
-    $games_completed_100_count_overall = $_SESSION['dashboard_stats']['games_100_count'] ?? 0;
-    $achievements_earned_display = $_SESSION['dashboard_stats']['total_ach_earned'] ?? 0;
-    
-    // THIS IS THE KEY CHANGE FOR THE SHOWCASE: Read the pre-compiled list
-    $completed_100_showcase_list = $_SESSION['dashboard_stats']['completed_100_showcase_games'] ?? []; 
-    error_log("PROFILE.PHP: Loaded showcase list from session. Count: " . count($completed_100_showcase_list));
+    // Overall stats from dashboard's session cache
+    $games_completed_100_count_overall = 0;
+    $achievements_earned_display = 0;
+    $completed_100_showcase_list = []; // Initialize as empty array
+
+    if (isset($_SESSION['dashboard_stats'])) {
+        $games_completed_100_count_overall = $_SESSION['dashboard_stats']['games_100_count'] ?? 0;
+        $achievements_earned_display = $_SESSION['dashboard_stats']['total_ach_earned'] ?? 0;
+        // THIS IS THE KEY: Read the pre-compiled list for the showcase
+        $completed_100_showcase_list = $_SESSION['dashboard_stats']['completed_100_showcase_games'] ?? [];
+        error_log("PROFILE.PHP: Loaded showcase list from session. Count: " . count($completed_100_showcase_list));
+    } else {
+        error_log("PROFILE.PHP: \$_SESSION['dashboard_stats'] not found. Stats will be default/empty. User should visit dashboard first.");
+        // Optionally, you could add a message on the profile page if dashboard_stats isn't set,
+        // guiding the user to visit the dashboard to populate these stats.
+    }
 
 
     // --- "Steam User For" ---
     $timecreated = $_SESSION['userData']['timecreated'] ?? null;
     $member_for_string = "N/A";
-    if ($timecreated) { 
+    if ($timecreated) {
         try {
             $creation_date = new DateTime("@{$timecreated}"); $now = new DateTime(); $interval = $now->diff($creation_date);
             $parts = [];
             if ($interval->y > 0) $parts[] = $interval->y . " year" . ($interval->y > 1 ? "s" : "");
             if ($interval->m > 0) $parts[] = $interval->m . " month" . ($interval->m > 1 ? "s" : "");
             if ($interval->d > 0 && ($interval->y == 0 && $interval->m == 0)) $parts[] = $interval->d . " day" . ($interval->d > 1 ? "s" : "");
-            elseif ($interval->y == 0 && $interval->m == 0 && $interval->d == 0) $parts[] = "Less than a day";
-            if (empty($parts)) $parts[] = "Recently joined";
+            elseif ($interval->y == 0 && $interval->m == 0 && $interval->d == 0) $parts[] = "Less than a day"; // Edge case for very new accounts
+            if (empty($parts) && $timecreated) $parts[] = "Joined recently"; // Fallback if interval is 0 for all parts but timecreated exists
+            else if (empty($parts)) $parts[] = "N/A"; // If timecreated was null and somehow parts remained empty
             $member_for_string = implode(', ', $parts);
         } catch (Exception $e) { $member_for_string = "Error"; error_log("PROFILE.PHP: DateTime error for member_for: " . $e->getMessage());}
     }
@@ -80,38 +87,58 @@
     <!--STYLE SHEETS-->
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css"> <!-- Make sure you have styles for .game-covers-grid and .game-cover-item -->
     <!---->
     <title><?php echo $username; ?>'s Profile - Chasing Completion</title>
 
 </head>
 <body>
     <?php include 'navbar.php'?>
-    <div class="profile-page-container"> 
-        <h1 class="profile-header"><?php echo $username; ?>'s Profile</h1>
+    <div class="profile-page-container">
 
         <div class="profile-user-card">
             <img class="profile-user-avatar" src="<?php echo $avatar; ?>" alt="<?php echo $username; ?>'s Avatar">
             <div class="profile-user-details">
                 <h2><?php echo $username; ?></h2>
-                <p><strong>Steam User For:</strong> <?php echo $member_for_string; ?></p>
-                <p><strong>Hours on Record:</strong> <?php echo $total_playtime_hours_display; ?> hrs</p>
-                <p><strong>Games 100% Completed:</strong> <?php echo $games_completed_100_count_overall; ?></p>
-                <p><strong>Total Achievements Earned:</strong> <?php echo $achievements_earned_display; ?></p> 
+                <p>Steam User For: <?php echo $member_for_string; ?></p>
+                <p>Hours on Record: <?php echo $total_playtime_hours_display; ?> hrs</p>
+                <p>Games 100% Completed: <?php echo $games_completed_100_count_overall; ?></p>
+                <p>Total Achievements Earned: <?php echo $achievements_earned_display; ?></p>
             </div>
         </div>
+        <div class="profile-section">
+            <h3>100% Completed Games Showcase</h3>
+            <?php if (!empty($completed_100_showcase_list)): ?>
+                <div class="game-covers-grid">
+                    <?php foreach($completed_100_showcase_list as $game): // $game is an array like ['appid' => ..., 'name' => ...] ?>
+                        <div class="game-cover-item">
+                             <a href="game-achievements.php?appid=<?php echo htmlspecialchars($game['appid']); ?>" title="View achievements for <?php echo htmlspecialchars($game['name']); ?>">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/<?php echo htmlspecialchars($game['appid']); ?>/library_600x900.jpg"
+                                     alt="<?php echo htmlspecialchars($game['name']); ?>"
+                                     onerror="this.onerror=null; this.src='Images/no-game-cover.png';">
 
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php elseif (isset($_SESSION['dashboard_stats'])): // dashboard_stats is set, but the showcase list is empty ?>
+                <p class="no-data-message">You haven't 100% completed any games with achievements yet!</p>
+            <?php else: // dashboard_stats isn't even set ?>
+                <p class="no-data-message">Game completion data is still being processed. Please visit your <a href="dashboard.php">Dashboard</a> or check back shortly.</p>
+                <p class="no-data-message"><small>(This list updates when your main dashboard stats are refreshed.)</small></p>
+            <?php endif; ?>
+        </div>
         <div class="profile-section">
             <h3>Recently Played</h3>
             <?php if (!empty($recently_played_games)): ?>
                 <div class="game-covers-grid">
                     <?php foreach($recently_played_games as $game): ?>
                         <div class="game-cover-item">
-                            <a href="game_achievements.php?appid=<?php echo $game['appid']; ?>" title="View achievements for <?php echo htmlspecialchars($game['name'] ?? ''); ?>">
-                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/<?php echo $game['appid']; ?>/library_600x900.jpg" 
+                            <a href="game-achievements.php?appid=<?php echo $game['appid']; ?>" title="View achievements for <?php echo htmlspecialchars($game['name'] ?? ''); ?>">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/<?php echo $game['appid']; ?>/library_600x900.jpg"
                                      alt="<?php echo htmlspecialchars($game['name'] ?? 'Game Cover'); ?>"
                                      onerror="this.onerror=null; this.src='Images/no-game-cover.png';">
-                                <p title="<?php echo htmlspecialchars($game['name'] ?? ''); ?>"><?php echo htmlspecialchars($game['name'] ?? 'Unknown Game'); ?></p>
+
                             </a>
                         </div>
                     <?php endforeach; ?>
@@ -121,30 +148,11 @@
             <?php endif; ?>
         </div>
 
-        <div class="profile-section">
-            <h3>100% Completed Games Showcase</h3>
-            <?php if (!empty($completed_100_showcase_list)): ?>
-                <div class="game-covers-grid">
-                    <?php foreach($completed_100_showcase_list as $game): // $game is now an array like ['appid' => ..., 'name' => ...] ?>
-                        <div class="game-cover-item">
-                             <a href="game_achievements.php?appid=<?php echo $game['appid']; ?>" title="View achievements for <?php echo htmlspecialchars($game['name']); ?>">
-                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/<?php echo $game['appid']; ?>/library_600x900.jpg" 
-                                     alt="<?php echo htmlspecialchars($game['name']); ?>"
-                                     onerror="this.onerror=null; this.src='Images/no-game-cover.png';">
-                                <p title="<?php echo htmlspecialchars($game['name']); ?>"><?php echo htmlspecialchars($game['name']); ?></p>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p class="no-data-message">No 100% completed games to showcase yet, or data is still being processed.</p>
-                <p class="no-data-message"><small>(This list updates when your main dashboard stats are refreshed.)</small></p>
-            <?php endif; ?>
-        </div>
-        
+
+
     </div>
 
     <?php include 'footer.php'?>
+    <script src="javascript/bar-menu.js"></script>
 </body>
-<script src="javascript/bar-menu.js"></script>
 </html>

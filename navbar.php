@@ -36,7 +36,6 @@
     <ul>
         <a href="games.php">Games</a>
         <a href="profile.php">Profile</a>
-        <a href="achievements.php">Achievements</a>
         <a href="user-stats.php">User Stats</a>
     </ul>
 
@@ -65,7 +64,6 @@
 
                 echo '<li><a href="games.php">Games</a></li>';
                 echo '<li><a href="profile.php">Profile</a></li>';
-                echo '<li><a href="achievements.php">Achievements</a></li>';
                 echo '<li><a href="user-stats.php">User Stats</a></li>';
                 echo "<li><a href='logout.php'>Logout</a></li>";
             }
