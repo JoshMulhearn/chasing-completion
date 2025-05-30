@@ -1,3 +1,16 @@
+<?php
+    session_start();
+
+    if(isset($_SESSION['admin_logged_in']))
+    {
+        $error_link = "admin-dashboard.php";
+    }
+    else
+    {
+        $error_link = "index.php";
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +31,7 @@
 <body>
     <div class="error-container">
         <h1>You do not have access to this page.</h1>
-        <li><a href="index.php">Home</a></li>
+         <li><a href="<?php echo $error_link;?>">Home</a></li>
     </div>
 </body>
 </html>

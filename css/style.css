@@ -487,7 +487,7 @@ body {
 .page-header-container a {
     text-decoration: none;
     color: white;
-    font-size: 15px;
+    font-size: 12px;
     border: 1px solid white;
     padding: 8px;
     border-radius: 20px;
@@ -765,4 +765,126 @@ body {
     padding: 20px;
 }
 
+/*admin dashboard*/
+.admin-dashboard-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
 
+.dashboard-main-title {
+    text-align: center;
+    font-family: 'genos';
+    color: white;
+    margin-bottom: 30px;
+    font-size: 32px;
+}
+
+.dashboard-panels-container {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 30px; 
+    justify-content: center; 
+}
+
+.dashboard-panel {
+    background-color: #171A21; /* Darker panel background */
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    min-width: 320px; 
+    max-width: 550px; 
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-panel h3 {
+    font-family: 'genos', sans-serif;
+    color: white;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 1px solid white;
+    padding-bottom: 10px;
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1; 
+}
+
+.item-row {
+    display: flex;
+    background-color: #2A475E; 
+    border: 1px solid white;
+    margin-bottom: 10px;
+    overflow: hidden; 
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.item-row:hover {
+    background-color: #3e5b76;
+}
+
+.item-row div {
+    padding: 12px 15px;
+    font-size: 16px;
+    color: white;
+    font-family: "roboto";
+}
+
+.item-user {
+    flex-basis: 35%; /*adjusts as needed*/
+    border-right: 1px solid white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-details {
+    flex-basis: 50%;
+    border-right: 1px solid white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-action {
+    flex-basis: 15%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+        
+.input[type="checkbox"] { 
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 1px solid #171A21;
+    border-radius: 3px;
+}
+
+.panel-button {
+    background-color: #2A475E; /* Button color */
+    color: white;
+    border: 1px solid white;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%; /* Make button full width of panel */
+    font-family: 'Roboto';
+}
+
+.panel-button:hover {
+    background-color: #4a8ac0;
+}

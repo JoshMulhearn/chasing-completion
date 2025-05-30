@@ -14,6 +14,10 @@
         //home link changes to dashboard.php when user is logged in
         $home_link = "dashboard.php";
     }
+    if(isset($_SESSION['admin_logged_in']))
+    {
+        $home_link = "admin-dashboard.php";
+    }
 
 
 ?>
@@ -65,6 +69,13 @@
                 echo '<li><a href="games.php">Games</a></li>';
                 echo '<li><a href="profile.php">Profile</a></li>';
                 echo '<li><a href="user-stats.php">User Stats</a></li>';
+                echo "<li><a href='logout.php'>Logout</a></li>";
+            }
+        ?>
+
+        <?php 
+            if(isset($_SESSION['admin_logged_in']))
+            {
                 echo "<li><a href='logout.php'>Logout</a></li>";
             }
         ?>

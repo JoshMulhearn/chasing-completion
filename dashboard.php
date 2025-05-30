@@ -26,52 +26,52 @@
     require_once __DIR__ . '/steam-api-key.php';//api key
     $steam_api_key = defined('steam_api_key') ? steam_api_key : null;
 
-    // The $db_link variable will be defined (or set to false on failure) by db_connect.php
-    require_once __DIR__ . '/db_connect.php';//database connection
+    // The $pdo variable will be defined by db_connect.php
+    // If db_connect.php dies on error, this script won't continue.
+    // If it doesn't die, $pdo should be a PDO object.
+    require_once __DIR__ . '/db_connect.php';
 
 
     // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-    // FUNCTION DEFINITIONS (Originally from dashboard.php)
+    // FUNCTION DEFINITIONS (Now using PDO)
     // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
 
-    // This function is still needed by dashboard.php for its initial load.
-    function getLeaderboardData($db_connection, $limit = 6) {
+    function getLeaderboardData($pdo_connection, $limit = 6) {
         $leaderboard = [];
-        if (!$db_connection || (is_object($db_connection) && $db_connection->connect_error)) {
-            error_log("getLeaderboardData: Database connection error or link not valid.");
+        if (!$pdo_connection || !($pdo_connection instanceof PDO)) {
+            error_log("getLeaderboardData: PDO connection not valid or not provided.");
             return $leaderboard;
         }
         $sql = "SELECT steam_id, username, avatar_url, games_completed_100_percent
                 FROM users
                 ORDER BY games_completed_100_percent DESC, total_achievements_earned DESC
-                LIMIT ?";
-        if ($stmt = mysqli_prepare($db_connection, $sql)) {
-            mysqli_stmt_bind_param($stmt, "i", $limit);
-            if (mysqli_stmt_execute($stmt)) {
-                $result = mysqli_stmt_get_result($stmt);
+                LIMIT :limitVal"; // Use a named placeholder
+        try {
+            $stmt = $pdo_connection->prepare($sql);
+            $stmt->bindParam(':limitVal', $limit, PDO::PARAM_INT); // Bind the integer limit
+            if ($stmt->execute()) {
                 $rank = 1;
-                while ($row = mysqli_fetch_assoc($result)) {
+                // PDO::FETCH_ASSOC is default if set in $options in db_connect.php
+                while ($row = $stmt->fetch()) {
                     $row['rank'] = $rank++; // Add rank to the row
                     $leaderboard[] = $row;
                 }
-                mysqli_free_result($result);
             } else {
-                 error_log("getLeaderboardData Error: Failed to execute statement. " . mysqli_stmt_error($stmt));
+                 // With PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, execute() throws an exception on failure.
+                 // This else block might not be reached for query execution errors.
+                 error_log("getLeaderboardData Error: Failed to execute statement. Info: " . implode(", ", $stmt->errorInfo()));
             }
-            mysqli_stmt_close($stmt);
-        } else {
-            error_log("getLeaderboardData Error: Failed to prepare statement. " . mysqli_error($db_connection));
+        } catch (PDOException $e) {
+            error_log("getLeaderboardData PDOException: " . $e->getMessage());
         }
         return $leaderboard;
     }
 
     // The following functions' primary execution will be in fetch_dashboard_stats.php.
     // They are included here because they were originally part of dashboard.php.
-    // If you ensure fetch_dashboard_stats.php has its own copies or includes them,
-    // you could technically remove them from here if dashboard.php *never* calls them directly.
-    // However, for Option 1 (keeping them in dashboard.php if they were there), here they are.
 
     function getAndCacheGameSchema($appId, $api_key_param, $cacheDir = 'cache/', $cacheDuration = 86400) {
+        // This function does not use the database, no changes needed for PDO conversion.
         if (!$api_key_param) {
             error_log("dashboard.php - getAndCacheGameSchema: API key not provided for AppID {$appId}.");
             return [];
@@ -117,11 +117,11 @@
         return $gameSchemaAchievements;
     }
 
-    // Remember the modification to include $out_completed_100_games_list
     function calculateUserStats($user_steamID64_param, $api_key_param, &$out_games_100_count, &$out_total_ach_earned_count, &$out_completed_100_games_list) {
+        // This function does not use the database, no changes needed for PDO conversion.
         $out_games_100_count = 0;
         $out_total_ach_earned_count = 0;
-        $out_completed_100_games_list = []; // Initialize the list
+        $out_completed_100_games_list = [];
 
         if (!$user_steamID64_param || !$api_key_param || !isset($_SESSION['userData']['owned_games']['games']) || !is_array($_SESSION['userData']['owned_games']['games'])) {
             error_log("dashboard.php - calculateUserStats: Missing required data for User: {$user_steamID64_param}");
@@ -133,7 +133,7 @@
             if (!isset($ownedGame['appid'])) continue;
             $appId = $ownedGame['appid'];
             $gameName = $ownedGame['name'] ?? 'Unknown Game';
-            $gameSchema = getAndCacheGameSchema($appId, $api_key_param); // Uses the getAndCacheGameSchema defined in this file
+            $gameSchema = getAndCacheGameSchema($appId, $api_key_param);
             $totalAchievementsInSchema = count($gameSchema);
             $achievedCountForThisGame = 0;
 
@@ -156,7 +156,7 @@
             $out_total_ach_earned_count += $achievedCountForThisGame;
             if ($totalAchievementsInSchema > 0 && $achievedCountForThisGame === $totalAchievementsInSchema) {
                 $out_games_100_count++;
-                if (count($out_completed_100_games_list) < 12) { // Example limit
+                if (count($out_completed_100_games_list) < 12) {
                      $out_completed_100_games_list[] = ['appid' => $appId, 'name' => $gameName];
                 }
             }
@@ -164,33 +164,40 @@
          error_log("dashboard.php - calculateUserStats: Finished for User: {$user_steamID64_param}. 100% Games: {$out_games_100_count}, Total Ach: {$out_total_ach_earned_count}");
     }
 
-    function updateUserStatsInDB($steam_id_param, $username_param, $avatar_url_param, $games_100, $total_ach_earned, $db_connection) {
-        if (!$db_connection || (is_object($db_connection) && $db_connection->connect_error)) {
-             error_log("dashboard.php - updateUserStatsInDB: Database connection error or link not valid. User: {$steam_id_param}");
+    function updateUserStatsInDB($steam_id_param, $username_param, $avatar_url_param, $games_100, $total_ach_earned, $pdo_connection) {
+        if (!$pdo_connection || !($pdo_connection instanceof PDO)) {
+             error_log("dashboard.php - updateUserStatsInDB: PDO connection not valid or not provided. User: {$steam_id_param}");
              return false;
         }
         $sql = "INSERT INTO users (steam_id, username, avatar_url, games_completed_100_percent, total_achievements_earned)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (:steam_id, :username, :avatar_url, :games_100, :total_ach_earned)
                 ON DUPLICATE KEY UPDATE
                 username = VALUES(username),
                 avatar_url = VALUES(avatar_url),
                 games_completed_100_percent = VALUES(games_completed_100_percent),
                 total_achievements_earned = VALUES(total_achievements_earned),
                 last_updated = CURRENT_TIMESTAMP";
-
-        if ($stmt = mysqli_prepare($db_connection, $sql)) {
-            mysqli_stmt_bind_param($stmt, "sssis", $steam_id_param, $username_param, $avatar_url_param, $games_100, $total_ach_earned);
-            if (mysqli_stmt_execute($stmt)) {
-                mysqli_stmt_close($stmt);
+        try {
+            $stmt = $pdo_connection->prepare($sql);
+            // Bind parameters directly in execute array for cleaner code
+            $params = [
+                ':steam_id' => $steam_id_param,
+                ':username' => $username_param,
+                ':avatar_url' => $avatar_url_param,
+                ':games_100' => $games_100,
+                ':total_ach_earned' => $total_ach_earned
+            ];
+            if ($stmt->execute($params)) {
                 return true;
             } else {
-                error_log("dashboard.php - DB Update Error: Failed to execute statement for user {$steam_id_param}. " . mysqli_stmt_error($stmt));
+                // With PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, execute() throws an exception on failure.
+                error_log("dashboard.php - DB Update Error: Failed to execute statement for user {$steam_id_param}. Info: " . implode(", ", $stmt->errorInfo()));
+                return false;
             }
-            mysqli_stmt_close($stmt);
-        } else {
-            error_log("dashboard.php - DB Update Error: Failed to prepare statement for user {$steam_id_param}. " . mysqli_error($db_connection));
+        } catch (PDOException $e) {
+            error_log("dashboard.php - DB Update PDOException for user {$steam_id_param}: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
     // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
     // END OF FUNCTION DEFINITIONS
@@ -201,36 +208,37 @@
     $STATS_CACHE_DURATION = 3600 * 1; // 1 hour
     $initial_games_completed = "Loading...";
     $initial_achievements_earned = "Loading...";
-    $needs_ajax_update = true; // This variable will be passed to JavaScript
+    $needs_ajax_update = true;
 
     if (isset($_SESSION['dashboard_stats']['games_100_count'],
               $_SESSION['dashboard_stats']['total_ach_earned'],
-              $_SESSION['dashboard_stats']['stats_last_updated']) && // 'completed_100_showcase_games' is not strictly needed for initial display numbers
+              $_SESSION['dashboard_stats']['stats_last_updated']) &&
         (time() - $_SESSION['dashboard_stats']['stats_last_updated'] < $STATS_CACHE_DURATION)) {
 
         $initial_games_completed = $_SESSION['dashboard_stats']['games_100_count'];
         $initial_achievements_earned = $_SESSION['dashboard_stats']['total_ach_earned'];
-        // $needs_ajax_update = false; // Option: If cache is fresh, you could decide not to make the AJAX call
-                                    // For now, we'll always suggest an AJAX call to ensure freshness or start calculation
         error_log("Dashboard: Displaying initial stats from FRESH SESSION cache for user {$steamID64}. AJAX will still check/update.");
     } else {
         error_log("Dashboard: Initial stats from session are STALE or MISSING for user {$steamID64}. Will use AJAX to fetch/calculate.");
     }
 
 
-    //fetch Leaderboard Data - this is fast and done on initial load
+    //fetch Leaderboard Data
     $leaderboardEntries = [];
-    if ($db_link) { // Check if $db_link is truthy (i.e., connection succeeded)
-        $leaderboardEntries = getLeaderboardData($db_link, 6); // This call is now valid
-        error_log("Dashboard: Fetched " . count($leaderboardEntries) . " leaderboard entries for initial load.");
+    // $pdo is defined by db_connect.php. Check if it's a valid PDO object.
+    if (isset($pdo) && $pdo instanceof PDO) {
+        $leaderboardEntries = getLeaderboardData($pdo, 6); // Pass the $pdo object
+        error_log("Dashboard: Attempted to fetch " . count($leaderboardEntries) . " leaderboard entries for initial load using PDO.");
     } else {
-        error_log("Dashboard: Not fetching leaderboard for initial load. DB connection failed or $db_link is not set.");
+        error_log("Dashboard: Not fetching leaderboard for initial load. PDO connection object (\$pdo) is not available or not valid.");
     }
 
-    //close DB connection if it was opened and is a valid resource
-    if ($db_link && is_object($db_link) && get_class($db_link) === 'mysqli') {
-        mysqli_close($db_link);
-        // error_log("Dashboard: DB connection closed after leaderboard fetch.");
+    // It's good practice to null the PDO object when done with it for this script,
+    // especially if not at the very end. PHP would garbage collect it at script end anyway.
+    // If fetch_dashboard_stats.php also needs $pdo, it should establish its own via db_connect.php.
+    if (isset($pdo)) {
+        $pdo = null;
+        // error_log("Dashboard: PDO connection nulled after initial page load operations.");
     }
 ?>
 
@@ -247,7 +255,7 @@
     <!--STYLE SHEETS-->
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/style.css"> <!-- Make sure you have styles for .game-covers-grid and .game-cover-item -->
+    <link rel="stylesheet" href="css/style.css">
     <!---->
     <title>Chasing Completion - Dashboard</title>
 </head>
@@ -265,7 +273,7 @@
                         <h2>Logged in as <?php echo $username; ?></h2>
                         <p>Games Completed: <span id="gamesCompletedCount"><?php echo htmlspecialchars($initial_games_completed); ?></span></p>
                         <p>Achievements Earned: <span id="achievementsEarnedCount"><?php echo htmlspecialchars($initial_achievements_earned); ?></span></p>
-                        <small id="statsStatus"></small> <!-- For loading/status messages from JS -->
+                        <small id="statsStatus"></small>
                     </div>
                 </div>
 
@@ -318,51 +326,43 @@
     <?php include 'footer.php'?>
     <script src="javascript/bar-menu.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
 
-        const gamesCompletedElem = document.getElementById('gamesCompletedCount');
-        const achievementsEarnedElem = document.getElementById('achievementsEarnedCount');
-        const statsStatusElem = document.getElementById('statsStatus');
+            const gamesCompletedElem = document.getElementById('gamesCompletedCount');
+            const achievementsEarnedElem = document.getElementById('achievementsEarnedCount');
+            const statsStatusElem = document.getElementById('statsStatus');
 
-        // This value comes from PHP, indicating if an AJAX call is considered necessary
-        // based on server-side cache check. We'll always run it here for simplicity
-        // to either fetch fresh data or trigger calculation.
-        // const needsAjaxUpdate = <?php //echo json_encode($needs_ajax_update); ?>;
+            if (statsStatusElem) statsStatusElem.textContent = 'Checking/refreshing stats...';
 
-        // For Option 1, we can assume we always want to try and fetch/refresh.
-        // If fetch_dashboard_stats.php finds fresh session cache, it will return fast.
-        if (statsStatusElem) statsStatusElem.textContent = 'Checking/refreshing stats...';
-
-        fetch('fetch_dashboard_stats.php')
-            .then(response => {
-                if (!response.ok) {
-                    // Try to get error message from response if it's JSON, otherwise use statusText
-                    return response.json().catch(() => null).then(errorData => {
-                        throw new Error('Network response was not ok: ' + response.statusText + (errorData && errorData.error ? ' - ' + errorData.error : ''));
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    if (gamesCompletedElem) gamesCompletedElem.textContent = data.games_100_count;
-                    if (achievementsEarnedElem) achievementsEarnedElem.textContent = data.total_ach_earned;
-                    if (statsStatusElem) {
-                        statsStatusElem.textContent = data.source === 'recalculated' ? 'Stats recalculated & up to date.' : 'Stats up to date (from cache).';
+            fetch('fetch_dashboard_stats.php')
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().catch(() => null).then(errorData => {
+                            throw new Error('Network response was not ok: ' + response.statusText + (errorData && errorData.error ? ' - ' + errorData.error : ''));
+                        });
                     }
-                    setTimeout(() => {
-                        if (statsStatusElem) statsStatusElem.textContent = '';
-                    }, 5000); // Clear status message after 5 seconds
-                } else {
-                    console.error('Error fetching stats:', data.error);
-                    if (statsStatusElem) statsStatusElem.textContent = 'Error updating stats: ' + (data.error || 'Unknown error');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                if (statsStatusElem) statsStatusElem.textContent = 'Could not update stats. Please try refreshing. (' + error.message + ')';
-            });
-    });
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (gamesCompletedElem) gamesCompletedElem.textContent = data.games_100_count;
+                        if (achievementsEarnedElem) achievementsEarnedElem.textContent = data.total_ach_earned;
+                        if (statsStatusElem) {
+                            statsStatusElem.textContent = data.source === 'recalculated' ? 'Stats recalculated & up to date.' : 'Stats up to date (from cache).';
+                        }
+                        setTimeout(() => {
+                            if (statsStatusElem) statsStatusElem.textContent = '';
+                        }, 5000);
+                    } else {
+                        console.error('Error fetching stats:', data.error);
+                        if (statsStatusElem) statsStatusElem.textContent = 'Error updating stats: ' + (data.error || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    if (statsStatusElem) statsStatusElem.textContent = 'Could not update stats. Please try refreshing. (' + error.message + ')';
+                });
+        });
     </script>
 </body>
 </html>
